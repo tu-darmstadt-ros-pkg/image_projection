@@ -2,9 +2,9 @@
 <package format="2">
   <name>image_projection</name>
   <version>0.0.0</version>
-  <description>The image_projection package</description>
+  <description>image_projection is a ROS package to create various projections from multiple calibrated cameras.</description>
   <maintainer email="oehler@sim.tu-darmstadt.de">Martin Oehler</maintainer>
-  <license>BSD</license>
+  <license>MIT</license>
   <!-- <url type="website">http://wiki.ros.org/image_projection</url> -->
   <author email="oehler@sim.tu-darmstadt.de">Martin Oehler</author>
 
