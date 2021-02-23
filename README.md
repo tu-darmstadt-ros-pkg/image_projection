@@ -14,9 +14,13 @@ Available projection targets are:
  - Mercator projection
  - Ideal fisheye projection
 
-Projections can be created periodically (see _periodic_image_projection_node_) or on-demand (_image_projection_server_node_). All projection parameters including image dimensions and position/direction can be configured dynamically at runtime. All cameras have to be calibrated beforehand; the calibration data is provided via ros topics. Supported formats are [sensor_msgs/CameraInfo] from e.g. [camera_calibration] (pinhole cameras only) and [kalibr_image_geometry_msgs/ExtendedCameraInfo] with [kalibr](https://github.com/ethz-asl/kalibr) calibration (pinhole and fisheye cameras).
+Projections can be created periodically or on-demand. All projection parameters including image dimensions and position/direction can be configured dynamically at runtime. All cameras have to be calibrated beforehand.
 
 A demo launch configuration is available below.
+
+**Author/Maintainer: Martin Oehler
+Affiliation:  [TU Darmstadt, SIM](https://www.sim.informatik.tu-darmstadt.de/index/)
+License: MIT**
 
 ## Examples
 
