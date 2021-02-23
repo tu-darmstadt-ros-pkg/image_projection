@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>image_projection</name>
+  <version>0.0.0</version>
+  <description>The image_projection package</description>
+  <maintainer email="oehler@sim.tu-darmstadt.de">Martin Oehler</maintainer>
+  <license>BSD</license>
+  <!-- <url type="website">http://wiki.ros.org/image_projection</url> -->
+  <author email="oehler@sim.tu-darmstadt.de">Martin Oehler</author>
+
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <depend>roscpp</depend>
+  <depend>nodelet</depend>
+  <depend>pcl_ros</depend>
+  <depend>sensor_msgs</depend>
+  <depend>tf2_ros</depend>
+  <depend>tf2_geometry_msgs</depend>
+  <depend>tf_conversions</depend>
+  <depend>kalibr_camera_loader</depend>
+  <depend>eigen_conversions</depend>
+  <depend>image_projection_msgs</depend>
+  <depend>image_projection_plugin_interface</depend>
+  <depend>dynamic_reconfigure</depend>
+  <depend>image_transport</depend>
+
+  <export>
+    <nodelet plugin="${prefix}/nodelet_plugins.xml" />
+  </export>
+</package>

@@ -1,0 +1,14 @@
+<library path="lib/libimage_projection_plugins">
+  <class type="image_projection_plugins::PinholeProjection" base_class_type="image_projection_plugin_interface::ProjectionBase">
+    <description>Pinhole projection plugin</description>
+  </class>
+  <class type="image_projection_plugins::IdealFisheyeProjection" base_class_type="image_projection_plugin_interface::ProjectionBase">
+    <description>Ideal fisheye projection. Linear correspondence between radius on the fisheye image and corresponding angle of the 3D ray.</description>
+  </class>
+  <class type="image_projection_plugins::MercatorProjection" base_class_type="image_projection_plugin_interface::ProjectionBase">
+    <description>Mercator projection plugin</description>
+  </class>
+  <class type="image_projection_plugins::EquirectangularProjection" base_class_type="image_projection_plugin_interface::ProjectionBase">
+    <description>Equirectangular projection plugin</description>
+  </class>
+</library>

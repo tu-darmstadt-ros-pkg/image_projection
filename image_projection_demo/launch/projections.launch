@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+
+<launch>
+  <arg name="camera_name" default="camera360" />
+  <arg name="nodelet_manager" default="$(arg camera_name)_nodelet_manager"/>
+  
+  <!-- Publish the calibration -->
+  <include file="$(find image_projection_demo)/launch/calibration_publisher.launch"/>
+  
+  
+  <!-- Start the projections -->
+  <node pkg="nodelet" type="nodelet" name="$(arg nodelet_manager)" args="manager" output="screen" respawn="true"/>
+
+  <!-- Load parameters for all nodes -->
+  <rosparam command="load" file="$(find image_projection_demo)/config/projections.yaml" subst_value="true"/>
+  
+  <!-- Front view pinhole projection -->
+  <node pkg="nodelet" type="nodelet" name="$(arg camera_name)_pinhole_front" args="load image_projection/PeriodicImageProjectionNodelet $(arg nodelet_manager)" output="screen" respawn="true">
+    <rosparam file="$(find image_projection_demo)/config/$(arg camera_name)_cameras.yaml" command="load"/>
+    
+    <remap from="~projection" to="/$(arg camera_name)/pinhole_front/image_rect_color" />
+    <remap from="~camera_info" to="/$(arg camera_name)/pinhole_front/camera_info" />
+  </node>
+  
+  <!-- Mercator projection -->
+  <node pkg="nodelet" type="nodelet" name="$(arg camera_name)_mercator_projection" args="load image_projection/PeriodicImageProjectionNodelet $(arg nodelet_manager)" output="screen" respawn="true">
+    <rosparam file="$(find image_projection_demo)/config/$(arg camera_name)_cameras.yaml" command="load"/>
+  
+    <remap from="~projection" to="/$(arg camera_name)/mercator" />
+  </node>
+
+  <!-- Ideal fisheye -->
+  <!-- Left fisheye -->
+  <node pkg="nodelet" type="nodelet" name="$(arg camera_name)_left_fisheye" args="load image_projection/PeriodicImageProjectionNodelet $(arg nodelet_manager)" output="screen" respawn="true">
+    <rosparam file="$(find image_projection_demo)/config/$(arg camera_name)_cameras.yaml" command="load"/>
+
+    <remap from="~projection" to="/$(arg camera_name)/left/ideal_fisheye" />
+  </node>
+  <!-- Right fisheye -->
+  <node pkg="nodelet" type="nodelet" name="$(arg camera_name)_right_fisheye" args="load image_projection/PeriodicImageProjectionNodelet $(arg nodelet_manager)" output="screen" respawn="true">
+    <rosparam file="$(find image_projection_demo)/config/$(arg camera_name)_cameras.yaml" command="load"/>
+
+    <remap from="~projection" to="/$(arg camera_name)/right/ideal_fisheye" />
+  </node>
+
+</launch>

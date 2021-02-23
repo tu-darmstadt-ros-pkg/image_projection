@@ -1,0 +1,4 @@
+- git: {local-name: src/image_projection, uri: 'https://github.com/tu-darmstadt-ros-pkg/image_projection.git', version: master}
+- git: {local-name: src/kalibr, uri: 'https://github.com/tu-darmstadt-ros-pkg/kalibr.git', version: noetic-devel}
+- git: {local-name: src/kalibr_image_geometry, uri: 'https://github.com/tu-darmstadt-ros-pkg/kalibr_image_geometry.git', version: master}
+- git: {local-name: src/catkin_simple, uri: 'https://github.com/catkin/catkin_simple', version: master}

@@ -1,0 +1,17 @@
+cameras:
+  cam0:
+    camera_model: omni
+    intrinsics: [2.7910537654584546, 716.5089335687251, 715.3601904425212, 318.166766102288, 319.0957056130196]
+    distortion_model: radtan
+    distortion_coeffs: [0.23853332721924964, 4.248490966565388, -0.0006254981748840045, -0.001160012388950163]
+    resolution: [640, 640]
+    rostopic: /ricoh_theta/right/image_raw
+    frame_id: ricoh_theta_right_optical_frame
+  cam1:
+    camera_model: omni
+    intrinsics: [2.876577222059577, 734.9404175350297, 734.5042245777831, 320.95741696234273, 319.5542782716258]
+    distortion_model: radtan
+    distortion_coeffs: [0.2563957348041241, 5.3902484030522215, -0.0028047482345770294, 0.0006182809982583578]
+    resolution: [640, 640]
+    rostopic: /ricoh_theta/left/image_raw
+    frame_id: ricoh_theta_left_optical_frame

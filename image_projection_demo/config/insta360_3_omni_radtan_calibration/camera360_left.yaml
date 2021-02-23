@@ -1,0 +1,9 @@
+camera_name: cam_left
+resolution: [1504, 1504]
+camera_model: omni
+intrinsics: [1.7503827001298708, 1280.9434853010955, 1280.346616094328, 744.18018744745,
+      749.338173173202]
+distortion_model: radtan
+distortion_coeffs: [-0.25005483726150773, 0.15486545863797438, 0.0006619539678191391,
+      0.004799650294887792]
+mask_path: $(find image_projection_demo)/config/insta360_3_omni_radtan_calibration/left_mask.png

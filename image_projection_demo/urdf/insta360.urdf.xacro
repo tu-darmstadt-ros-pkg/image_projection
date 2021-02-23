@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+
+<robot name="insta360_air" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:include filename="$(find hector_sensors_description)/urdf/camera360.urdf.xacro"/>  
+  
+  <link name="base_link"/>
+  
+  <xacro:camera360 name="camera360" right_cam_name="right" left_cam_name="left" parent="base_link" collision_radius="0.05" dist_between_cameras="-0.03850784" ros_topic="image_raw" update_rate="10" res_x="1504" res_y="1504" image_format="R8G8B8" fov="${pi}">
+    <origin xyz="0 0 0" rpy="0.0 0 0"/> <!-- base_link to camera mount transform -->
+    <!-- cam to cam transform (calibration by kalibr) -->
+    <origin xyz="0.002862424041614364  -0.00013127655875068252 -0.03724378451297336" rpy="-3.1402707 0.0036289 -3.1175768"/>
+  </xacro:camera360>
+
+</robot>

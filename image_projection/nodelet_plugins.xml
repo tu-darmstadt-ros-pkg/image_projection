@@ -1,0 +1,7 @@
+<library path="lib/libimage_projection">
+  <class name="image_projection/PeriodicImageProjectionNodelet" type="image_projection::PeriodicImageProjectionNodelet" base_class_type="nodelet::Nodelet">
+    <description>
+      Periodically publishes projected images.
+    </description>
+  </class>
+</library>

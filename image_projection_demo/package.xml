@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>image_projection_demo</name>
+  <version>0.0.0</version>
+  <description>Demo project for image_projection</description>
+
+  <!-- One maintainer tag required, multiple allowed, one person per tag -->
+  <maintainer email="oehler@sim.tu-darmstadt.de">Martin Oehler</maintainer>
+
+
+  <!-- One license tag required, multiple allowed, one license per tag -->
+  <!-- Commonly used license strings: -->
+  <!--   BSD, MIT, Boost Software License, GPLv2, GPLv3, LGPLv2.1, LGPLv3 -->
+  <license>TODO</license>
+
+
+  <!-- Url tags are optional, but multiple are allowed, one per tag -->
+  <!-- Optional attribute type can be: website, bugtracker, or repository -->
+  <!-- Example: -->
+  <!-- <url type="website">http://wiki.ros.org/image_projection_demo</url> -->
+
+
+  <!-- Author tags are optional, multiple are allowed, one per tag -->
+  <!-- Authors do not have to be maintainers, but could be -->
+  <!-- Example: -->
+  <author email="oehler@sim.tu-darmstadt.de">Martin Oehler</author>
+
+
+  <!-- The *depend tags are used to specify dependencies -->
+  <buildtool_depend>catkin</buildtool_depend>
+  <exec_depend>nodelet</exec_depend>
+  <exec_depend>image_projection</exec_depend>
+  <exec_depend>image_projection_plugins</exec_depend>
+  <exec_depend>kalibr_extended_camera_info_publisher</exec_depend>
+  <exec_depend>rosbag</exec_depend>
+  <exec_depend>image_transport</exec_depend>
+  <exec_depend>robot_state_publisher</exec_depend>
+  <exec_depend>tf2_ros</exec_depend>
+  <exec_depend>hector_sensors_description</exec_depend>
+  <exec_depend>xacro</exec_depend>
+  <exec_depend>hector_sensors_description</exec_depend>
+  <exec_depend>image_proc</exec_depend>
+  <exec_depend>rqt_gui</exec_depend>
+
+  <!-- The export tag contains other, unspecified, tags -->
+  <export>
+  </export>
+</package>

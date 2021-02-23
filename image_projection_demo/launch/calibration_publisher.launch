@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+
+<launch>    
+  <!-- Publish extended camera info -->  
+  <arg name="camera_name" default="camera360"/>
+  <arg name="calibration_name" default="insta360_3_omni_radtan_calibration"/>
+  
+  <node name="$(arg camera_name)_left_camera_info_publisher" pkg="kalibr_extended_camera_info_publisher" type="camera_info_publisher_node">
+    <param name="camera_ns" value="/$(arg camera_name)/left"/>
+    <param name="frame_id" value="$(arg camera_name)_left_optical_frame"/>
+    <rosparam file="$(find image_projection_demo)/config/$(arg calibration_name)/camera360_left.yaml" command="load" subst_value="true" />
+  </node>
+  
+  <node name="$(arg camera_name)_right_camera_info_publisher" pkg="kalibr_extended_camera_info_publisher" type="camera_info_publisher_node">
+    <param name="camera_ns" value="/$(arg camera_name)/right"/>
+    <param name="frame_id" value="$(arg camera_name)_right_optical_frame"/>
+    <rosparam file="$(find image_projection_demo)/config/$(arg calibration_name)/camera360_right.yaml" command="load" subst_value="true" />
+  </node>
+</launch>

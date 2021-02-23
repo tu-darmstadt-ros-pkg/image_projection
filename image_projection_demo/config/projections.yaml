@@ -1,0 +1,55 @@
+# Front view pinhole projection
+$(arg camera_name)_pinhole_front:
+  update_rate: 10
+  always_recompute_mapping: false
+  base_frame: $(arg camera_name)_center_link
+  pose: [0, 0, 0, 0, 0.4, 0]
+  virtual_sensor_frame: pinhole_front_camera_frame
+  virtual_sensor_optical_frame: pinhole_front_optical_frame
+  projection_type: image_projection_plugins::PinholeProjection
+  projection_parameters:
+    image_width: 512
+    image_height: 256
+    horizontal_fov: 130
+    focal_length: 1
+
+# Mercator projection
+$(arg camera_name)_mercator_projection:
+  update_rate: 10
+  base_frame: $(arg camera_name)_center_link
+  pose: [0, 0, 0, 0, 0, 3.141592]
+  projection_type: image_projection_plugins::MercatorProjection
+  projection_parameters:
+    image_width: 643
+    image_height: 512
+    cylinder_radius: 1.0
+    vertical_fov: 136
+  
+# Ideal fisheye
+$(arg camera_name)_left_fisheye:
+  update_rate: 10
+  always_recompute_mapping: false
+  base_frame: $(arg camera_name)_center_link
+  pose: [0, 0, 0, 0, 0, 1.57]
+  virtual_sensor_frame: camera360_ideal_fisheye_left_link
+  virtual_sensor_optical_frame: camera360_ideal_fisheye_left_optical_frame
+  projection_type: image_projection_plugins::IdealFisheyeProjection
+  projection_parameters:
+    image_width: &fisheye_resolution 512
+    image_height: *fisheye_resolution
+    fov: &fisheye_fov 180
+    sphere_radius: &fisheye_sphere_radius 1
+
+$(arg camera_name)_right_fisheye:
+  update_rate: 10
+  always_recompute_mapping: false
+  base_frame: $(arg camera_name)_center_link
+  pose: [0, 0, 0, 0, 0, -1.57]
+  virtual_sensor_frame: camera360_ideal_fisheye_right_link
+  virtual_sensor_optical_frame: camera360_ideal_fisheye_right_optical_frame
+  projection_type: image_projection_plugins::IdealFisheyeProjection
+  projection_parameters:
+    image_width: *fisheye_resolution
+    image_height: *fisheye_resolution
+    fov: *fisheye_fov
+    sphere_radius: *fisheye_sphere_radius

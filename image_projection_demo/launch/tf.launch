@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+
+<launch>
+  <!-- Load the insta360 description -->
+  <param name="robot_description" command="$(find xacro)/xacro $(find image_projection_demo)/urdf/insta360.urdf.xacro"/>
+
+  <node name="robot_state_publisher" type="robot_state_publisher" pkg="robot_state_publisher" output="screen"/> 
+  
+  <node pkg="tf2_ros" type="buffer_server" name="tf2_buffer_server" output="screen"/>
+</launch>

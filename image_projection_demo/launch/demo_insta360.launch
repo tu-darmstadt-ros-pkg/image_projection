@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+
+<launch>
+  <arg name="bag_path" default="$(find image_projection_demo)/bags/insta360_air_robocup2018.bag"/>
+
+  <!-- Start bag playback -->
+  <include file="$(find image_projection_demo)/launch/rosbag.launch">
+    <arg name="bag_path" value="$(arg bag_path)"/>
+  </include>
+  
+  <!-- Start image projections -->
+  <include file="$(find image_projection_demo)/launch/projections.launch"/>
+  
+  <!-- Show in rqt -->
+  <include file="$(find image_projection_demo)/launch/rqt.launch"/>
+</launch>

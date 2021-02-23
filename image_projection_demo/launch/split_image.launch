@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+
+<launch>
+  <arg name="camera_name" default="camera360" />
+  <arg name="front_image_name" default="right"/>
+  <arg name="rear_image_name" default="left"/>  
+  
+  <arg name="split_image_width" default="640"/>
+  <arg name="split_image_height" default="640"/>
+    
+  <!-- Split image to left and right image -->
+  
+  <!-- Extract left image -->
+  <node pkg="nodelet" type="nodelet" name="$(arg camera_name)_split_right" args="load image_proc/crop_decimate $(arg camera_name)_nodelet_manager" output="screen" respawn="true">
+    <!--<param name="camera_info_url" value="$(arg camera_info_url_right)" />-->
+    <param name="queue_size" type="int" value="10" />
+    <param name="x_offset" type="int" value="0" />
+    <param name="y_offset" type="int" value="0" />
+    <param name="width" type="int" value="$(arg split_image_width)" />
+    <param name="height" type="int" value="$(arg split_image_height)" />
+    <param name="camera_name" value="front"/>
+    <param name="target_frame_id" value="$(arg camera_name)_right_optical_frame"/>
+
+    <remap from="camera/image_raw" to="/$(arg camera_name)/image_raw"/>
+    <remap from="camera/image_info" to="/$(arg camera_name)/camera_info"/>
+
+    <!-- remap output to right image -->
+    <remap from="camera_out/image_raw" to="/$(arg camera_name)/$(arg front_image_name)/image_raw" />
+    <!-- Dont use original camera info -->
+    <remap from="/stereo/right/camera_info" to="/null/right/camera_info" />
+  </node>
+  
+  <!-- Extract right image -->
+  <node pkg="nodelet" type="nodelet" name="$(arg camera_name)_split_left" args="load image_proc/crop_decimate $(arg camera_name)_nodelet_manager" output="screen" respawn="true">
+    <!--<param name="camera_info_url" value="$(arg camera_info_url_left)" />-->
+    <param name="queue_size" type="int" value="10" />
+    <param name="x_offset" type="int" value="$(arg split_image_width)" />
+    <param name="y_offset" type="int" value="0" />
+    <param name="width" type="int" value="$(arg split_image_width)" />
+    <param name="height" type="int" value="$(arg split_image_height)" />
+    <param name="camera_name" value="rear"/>
+    <param name="target_frame_id" value="$(arg camera_name)_left_optical_frame"/>
+
+    <remap from="camera/image_raw" to="/$(arg camera_name)/image_raw"/>
+    <remap from="camera/image_info" to="/$(arg camera_name)/camera_info"/>
+
+    <!-- remap output to left image -->
+    <remap from="camera_out/image_raw" to="/$(arg camera_name)/$(arg rear_image_name)/image_raw" />
+    <!-- Dont use original camera info -->
+    <remap from="/stereo/left/camera_info" to="/null/left/camera_info" />
+  </node>
+</launch>

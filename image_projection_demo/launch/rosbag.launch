@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+
+<launch>  
+  <arg name="bag_path" default="$(find image_projection_demo)/bags/insta360_air_robocup2018.bag"/>
+
+  <!-- Play bag -->
+  <param name="use_sim_time" value="true"/>
+  <node pkg="rosbag" type="play" name="rosbag_play" args="--clock $(arg bag_path)"/>
+
+  <!-- Create tf -->
+  <include file="$(find image_projection_demo)/launch/tf.launch"/>
+
+  <!-- Compressed image data to raw topic -->
+  <node pkg="image_transport" type="republish" name="republish_camera360_throttled" args="compressed in:=/camera360_nodelet_loader/compressed/image_raw raw out:=/camera360/image_raw" output="screen" respawn="true">
+    <remap from="/camera360_nodelet_loader/compressed/image_raw/compressed" to="/camera360_nodelet_loader/compressed/image_raw"/>    
+  </node>
+
+  <!-- Split image to left and right image -->
+  <include file="$(find image_projection_demo)/launch/split_image.launch">
+    <arg name="camera_name" value="camera360" />
+    <arg name="split_image_width" value="1504"/>
+    <arg name="split_image_height" value="1504"/>
+  </include>
+</launch>

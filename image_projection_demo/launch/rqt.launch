@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+
+<launch>
+  <arg name="rqt_perspective_path" default="$(find image_projection_demo)/rqt/default.perspective" />
+  <arg name="load_rqt_perspective_cmd" value="--perspective-file $(arg rqt_perspective_path)" />
+
+  <node name="$(anon rqt)" pkg="rqt_gui" type="rqt_gui" args="--force-discover $(arg load_rqt_perspective_cmd)"/>
+</launch>
