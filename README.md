@@ -18,8 +18,8 @@ Projections can be created periodically or on-demand. All projection parameters 
 
 A demo launch configuration is available below.
 
-**Author/Maintainer: Martin Oehler
-Affiliation:  [TU Darmstadt, SIM](https://www.sim.informatik.tu-darmstadt.de/index/)
+**Author/Maintainer: Martin Oehler<br/>
+Affiliation:  [TU Darmstadt, SIM](https://www.sim.informatik.tu-darmstadt.de/index/)<br/>
 License: MIT**
 
 ## Examples
