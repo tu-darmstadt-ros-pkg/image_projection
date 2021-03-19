@@ -71,7 +71,7 @@ bool PeriodicImageProjection::init()
 void PeriodicImageProjection::initProjectionMat()
 {
   pixel_mapping_.clear();
-  projected_image_ = cv::UMat(projection_->imageHeight(), projection_->imageWidth(), CV_8UC3, cv::Scalar::all(255), cv::USAGE_DEFAULT);
+  projected_image_ = cv::UMat(projection_->imageHeight(), projection_->imageWidth(), CV_8UC3, cv::Scalar::all(0), cv::USAGE_DEFAULT);
 }
 
 void PeriodicImageProjection::connectCb() {
