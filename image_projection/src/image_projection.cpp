@@ -79,7 +79,7 @@ PixelMapping ImageProjection::createMapping(const ProjectionPtr& projection, con
       transform = tf_buffer_->lookupTransform(cam_frame_id, base_frame, stamp, ros::Duration(1));
     } catch (const tf2::TransformException& e) {
       ROS_WARN_STREAM("LookupTransform failed. Reason: " << e.what());
-      continue;
+      return PixelMapping();
     }
     Eigen::Isometry3d cam_to_world;
     tf::transformMsgToEigen(transform.transform, cam_to_world);

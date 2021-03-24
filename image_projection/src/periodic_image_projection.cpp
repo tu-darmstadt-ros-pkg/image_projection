@@ -152,6 +152,10 @@ void PeriodicImageProjection::projectAndPublishLatestImages()
     // If no mapping is saved and camera info is available, compute it
     if (image_projection_lib_.getCameraLoader().cameraInfosReceived()) {
       pixel_mapping_ = image_projection_lib_.createMapping(projection_, base_frame_, stamp, virtual_sensor_pose_);
+      // Check if pixel mapping has been successful
+      if (pixel_mapping_.empty()) {
+        return;
+      }
       projection_->unsetMappingChanged();
     } else {
       ROS_WARN_STREAM_THROTTLE(1, "No camera info received yet.");
