@@ -10,6 +10,7 @@ PeriodicImageProjection::PeriodicImageProjection(const ros::NodeHandle& nh, cons
 
 bool PeriodicImageProjection::init()
 {
+
   // Load parameters
   std::string projection_type;
   loadMandatoryParameter(pnh_, "projection_type", projection_type);
@@ -22,10 +23,10 @@ bool PeriodicImageProjection::init()
     ROS_ERROR_STREAM("Pose offset has to have a size of 6");
     pose_vec.resize(6, 0);
   }
-  virtual_sensor_pose_ = Eigen::Isometry3d(Eigen::AngleAxisd(pose_vec[5], Eigen::Vector3d::UnitZ())
-     * Eigen::AngleAxisd(pose_vec[4], Eigen::Vector3d::UnitY())
-     * Eigen::AngleAxisd(pose_vec[3], Eigen::Vector3d::UnitX()));
-  virtual_sensor_pose_.translation() = Eigen::Vector3d(pose_vec[0], pose_vec[1], pose_vec[2]);
+
+  optical_frame_transform_ = Eigen::AngleAxisd(-M_PI/2, Eigen::Vector3d::UnitZ())
+                             * Eigen::AngleAxisd(-M_PI/2, Eigen::Vector3d::UnitX());
+  updateSensorPose(pose_vec[0], pose_vec[1], pose_vec[2], pose_vec[3], pose_vec[4], pose_vec[5]);
 
   // Initialize projection
   projection_ = image_projection_lib_.loadProjectionPlugin(projection_type);
@@ -51,11 +52,10 @@ bool PeriodicImageProjection::init()
   pnh_.param("virtual_sensor_frame", virtual_sensor_frame_, std::string(""));
   pnh_.param("virtual_sensor_optical_frame", virtual_sensor_optical_frame_, std::string(""));
   if (!virtual_sensor_optical_frame_.empty()) {
-    Eigen::Isometry3d optical_frame_transform(Eigen::AngleAxisd(-M_PI/2, Eigen::Vector3d::UnitZ())
-                                              * Eigen::AngleAxisd(-M_PI/2, Eigen::Vector3d::UnitX()));
+
     optical_transform_msg_.header.frame_id = virtual_sensor_frame_;
     optical_transform_msg_.child_frame_id = virtual_sensor_optical_frame_;
-    tf::transformEigenToMsg(optical_frame_transform, optical_transform_msg_.transform);
+    tf::transformEigenToMsg(optical_frame_transform_, optical_transform_msg_.transform);
   }
   if (publish_tf_) {
     tf_timer_ =  nh_.createTimer(ros::Duration(0.05), &PeriodicImageProjection::publishTfTimerCallback, this, false);
@@ -92,10 +92,7 @@ void PeriodicImageProjection::dynamicReconfigureCallback(ProjectionConfig& confi
   boost::recursive_mutex::scoped_lock mutex_lock(reconfigure_mutex_);
   ROS_INFO("Reconfigure request: Pose: [%f, %f, %f, %f, %f, %f]",
            config.pose_x, config.pose_y, config.pose_z, config.pose_roll, config.pose_pitch, config.pose_yaw);
-  virtual_sensor_pose_ = Eigen::Isometry3d(Eigen::AngleAxisd(config.pose_yaw, Eigen::Vector3d::UnitZ())
-     * Eigen::AngleAxisd(config.pose_pitch, Eigen::Vector3d::UnitY())
-     * Eigen::AngleAxisd(config.pose_roll, Eigen::Vector3d::UnitX()));
-  virtual_sensor_pose_.translation() = Eigen::Vector3d(config.pose_x, config.pose_y, config.pose_z);
+  updateSensorPose(config.pose_x, config.pose_y, config.pose_z, config.pose_roll, config.pose_pitch, config.pose_yaw);
   initProjectionMat();
   publishCameraFrameToTf();
 }
@@ -151,7 +148,7 @@ void PeriodicImageProjection::projectAndPublishLatestImages()
   if (pixel_mapping_.empty() || always_recompute_mapping_) {
     // If no mapping is saved and camera info is available, compute it
     if (image_projection_lib_.getCameraLoader().cameraInfosReceived()) {
-      pixel_mapping_ = image_projection_lib_.createMapping(projection_, base_frame_, stamp, virtual_sensor_pose_);
+      pixel_mapping_ = image_projection_lib_.createMapping(projection_, base_frame_, stamp, virtual_sensor_optical_pose_);
       // Check if pixel mapping has been successful
       if (pixel_mapping_.empty()) {
         return;
@@ -186,7 +183,7 @@ bool PeriodicImageProjection::projectPixelToRayCb(image_projection_msgs::Project
   // TODO what to do if projection was changed?
   Eigen::Vector2d pixel(req.pixel.point.x, req.pixel.point.y);
   Eigen::Vector3d ray = projection_->targetImagePixelToProjectionSurfacePoint(pixel);
-  ray = virtual_sensor_pose_ * ray;
+  ray = virtual_sensor_optical_pose_ * ray;
   ray = ray / ray.norm();
   tf::pointEigenToMsg(ray, resp.ray.point);
   resp.ray.header.frame_id = base_frame_;
@@ -221,6 +218,19 @@ void PeriodicImageProjection::publishCameraFrameToTf()
   }
   optical_transform_msg_.header.stamp = now;
   tf_broadcaster_.sendTransform(optical_transform_msg_);
+}
+
+void PeriodicImageProjection::updateSensorPose(const Eigen::Isometry3d& sensor_pose) {
+  virtual_sensor_pose_ = sensor_pose;
+  virtual_sensor_optical_pose_ = sensor_pose * optical_frame_transform_;
+}
+
+void PeriodicImageProjection::updateSensorPose(double x, double y, double z, double roll, double pitch, double yaw) {
+  Eigen::Isometry3d sensor_pose(Eigen::AngleAxisd(yaw, Eigen::Vector3d::UnitZ())
+                                           * Eigen::AngleAxisd(pitch, Eigen::Vector3d::UnitY())
+                                           * Eigen::AngleAxisd(roll, Eigen::Vector3d::UnitX()));
+  sensor_pose.translation() = Eigen::Vector3d(x, y, z);
+  updateSensorPose(sensor_pose);
 }
 
 }

@@ -24,6 +24,8 @@ private:
   void connectCb();
   void dynamicReconfigureCallback(ProjectionConfig &config, uint32_t /*level*/);
   void poseCallback(const geometry_msgs::PoseConstPtr& pose);
+  void updateSensorPose(const Eigen::Isometry3d& sensor_pose);
+  void updateSensorPose(double x, double y, double z, double roll, double pitch, double yaw);
   void updateReconfigureConfig(const std::vector<double>& pose_vec);
   bool projectPixelToRayCb(image_projection_msgs::ProjectPixelTo3DRay::Request& req, image_projection_msgs::ProjectPixelTo3DRay::Response &resp);
   void publishTfTimerCallback(const ros::TimerEvent& /*event*/);
@@ -64,6 +66,8 @@ private:
   std::string virtual_sensor_frame_;
   std::string virtual_sensor_optical_frame_;
   Eigen::Isometry3d virtual_sensor_pose_;
+  Eigen::Isometry3d virtual_sensor_optical_pose_;
+  Eigen::Isometry3d optical_frame_transform_;
   std::string encoding_;
   bool always_recompute_mapping_;
 };

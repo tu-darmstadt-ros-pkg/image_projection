@@ -8,7 +8,7 @@ bool PinholeProjection::initialize(const ros::NodeHandle& nh, const ros::NodeHan
   nh_ = nh;
   pnh_ = pnh;
   pnh_.param("virtual_sensor_optical_frame", virtual_sensor_optical_frame_, std::string(""));
-  if (virtual_sensor_optical_frame_ != "") {
+  if (!virtual_sensor_optical_frame_.empty()) {
     camera_info_pub_ = pnh_.advertise<sensor_msgs::CameraInfo>("camera_info", 10, true);
   }
   return true;
@@ -24,9 +24,14 @@ Eigen::Vector2d PinholeProjection::projectionSurfacePointToTargetImagePixel(cons
 Eigen::Vector3d PinholeProjection::targetImagePixelToProjectionSurfacePoint(const Eigen::Vector2d& target_image_pixel) const
 {
   Eigen::Vector3d point;
-  point.x() = focal_length_;
-  point.y() = (image_widht_2_ - target_image_pixel.x()) * m_per_pixel_;
-  point.z() = (image_height_2_ - target_image_pixel.y()) * m_per_pixel_;
+  // camera frame
+//  point.x() = focal_length_;
+//  point.y() = (image_widht_2_ - target_image_pixel.x()) * m_per_pixel_;
+//  point.z() =
+  // optical frame
+  point.x() = (target_image_pixel.x() - image_widht_2_) * m_per_pixel_;
+  point.y() = (target_image_pixel.y() - image_height_2_) * m_per_pixel_;
+  point.z() = focal_length_;
   return point;
 }
 
@@ -51,7 +56,7 @@ void PinholeProjection::parametersChanged()
 
 void PinholeProjection::publishCameraInfo()
 {
-  if (virtual_sensor_optical_frame_ == "") {
+  if (virtual_sensor_optical_frame_.empty()) {
     return;
   }
   sensor_msgs::CameraInfo info = parametersToCameraInfo();
