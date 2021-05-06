@@ -42,7 +42,7 @@ void MercatorProjection::parametersChanged()
   double cylinder_height = 2 * cylinder_radius_ * std::tan(vertical_fov_rad / 2.0);
   height_step_ = cylinder_height / static_cast<double>(imageHeight());
   angle_step_ = 2*M_PI / static_cast<double>(imageWidth());
-  image_height_2_ = imageHeight()/2;
+  image_height_2_ = static_cast<double>(imageHeight())/2.0;
 }
 
 }
