@@ -20,28 +20,27 @@ Eigen::Vector2d IdealFisheyeProjection::projectionSurfacePointToTargetImagePixel
 
 Eigen::Vector3d IdealFisheyeProjection::targetImagePixelToProjectionSurfacePoint(const Eigen::Vector2d& target_image_pixel) const
 {
-  // lat: x-y plane along z (image height)
-  // long: around z (image width)
-  double p_x = (image_widht_2_ - target_image_pixel[0]);
+  // Transform to polar coordinates
+  double p_x = target_image_pixel[0] - image_width_2_;
   double p_y = (image_height_2_ - target_image_pixel[1]);
   double long_angle = atan2(p_y, p_x);
-
   double r = sqrt(p_x * p_x + p_y * p_y);
   double lat_angle = r * angle_step_;
   if (lat_angle > fov_rad_2_) {
     return Eigen::Vector3d::Zero(); // TODO return invalid value
   }
 
+  // Map to 3D sphere
   Eigen::Vector3d point;
   // optical frame
-//  point.x() = sphere_radius_ * sin(lat_angle) * cos(long_angle);
-//  point.y() = sphere_radius_ * sin(lat_angle) * sin(long_angle);
-//  point.z() = sphere_radius_ * cos(lat_angle);
+  point.x() = sphere_radius_ * sin(lat_angle) * cos(long_angle);
+  point.y() = -sphere_radius_ * sin(lat_angle) * sin(long_angle);
+  point.z() = sphere_radius_ * cos(lat_angle);
 
   // camera frame
-  point.x() = sphere_radius_ * cos(lat_angle);
-  point.y() = sphere_radius_ * sin(lat_angle) * cos(long_angle);
-  point.z() = sphere_radius_ * sin(lat_angle) * sin(long_angle);
+//  point.x() = sphere_radius_ * cos(lat_angle);
+//  point.y() = sphere_radius_ * sin(lat_angle) * cos(long_angle);
+//  point.z() = sphere_radius_ * sin(lat_angle) * sin(long_angle);
 
   return point;
 }
@@ -58,7 +57,7 @@ void IdealFisheyeProjection::parametersChanged()
 {
   fov_rad_ = getParameter("fov") * M_PI / 180;
   sphere_radius_ = getParameter("sphere_radius");
-  image_widht_2_ = static_cast<double>(imageWidth()) / 2.0;
+  image_width_2_ = static_cast<double>(imageWidth()) / 2.0;
   image_height_2_ = static_cast<double>(imageHeight()) / 2.0;
   fov_rad_2_ = fov_rad_ / 2.0;
 

@@ -23,7 +23,7 @@ private:
   double fov_rad_;
   double fov_rad_2_;
   double angle_step_;
-  double image_widht_2_;
+  double image_width_2_;
   double image_height_2_;
 };
 
