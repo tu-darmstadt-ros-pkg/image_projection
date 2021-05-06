@@ -14,9 +14,14 @@ Eigen::Vector3d MercatorProjection::targetImagePixelToProjectionSurfacePoint(con
 {
   double angle = target_image_pixel[0] * -angle_step_;
   Eigen::Vector3d point;
-  point.x() = cylinder_radius_ * std::cos(angle);
-  point.y() = cylinder_radius_ * std::sin(angle);
-  point.z() = (image_height_2_-target_image_pixel[1]) * height_step_;
+  // camera frame
+//  point.x() = cylinder_radius_ * std::cos(angle);
+//  point.y() = cylinder_radius_ * std::sin(angle);
+//  point.z() = (image_height_2_-target_image_pixel[1]) * height_step_;
+  // optical frame
+  point.x() = -cylinder_radius_ * std::sin(angle);
+  point.y() = (target_image_pixel[1]-image_height_2_) * height_step_;
+  point.z() = cylinder_radius_ * std::cos(angle);
 
   return point;
 }
