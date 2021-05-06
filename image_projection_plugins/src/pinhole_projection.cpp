@@ -26,10 +26,10 @@ Eigen::Vector3d PinholeProjection::targetImagePixelToProjectionSurfacePoint(cons
   Eigen::Vector3d point;
   // camera frame
 //  point.x() = focal_length_;
-//  point.y() = (image_widht_2_ - target_image_pixel.x()) * m_per_pixel_;
+//  point.y() = (image_width_2_ - target_image_pixel.x()) * m_per_pixel_;
 //  point.z() =
   // optical frame
-  point.x() = (target_image_pixel.x() - image_widht_2_) * m_per_pixel_;
+  point.x() = (target_image_pixel.x() - image_width_2_) * m_per_pixel_;
   point.y() = (target_image_pixel.y() - image_height_2_) * m_per_pixel_;
   point.z() = focal_length_;
   return point;
@@ -49,7 +49,7 @@ void PinholeProjection::parametersChanged()
   double horizontal_fov_rad = getParameter("horizontal_fov") * M_PI / 180;
   double sensor_size_x = 2 * focal_length_ * std::tan(horizontal_fov_rad / 2.0);
   m_per_pixel_ = sensor_size_x / imageWidth();
-  image_widht_2_ = static_cast<double>(imageWidth()) / 2.0;
+  image_width_2_ = static_cast<double>(imageWidth()) / 2.0;
   image_height_2_ = static_cast<double>(imageHeight()) / 2.0;
   publishCameraInfo();
 }
@@ -72,7 +72,7 @@ sensor_msgs::CameraInfo PinholeProjection::parametersToCameraInfo() const
   info_msg.width = static_cast<unsigned int>(imageWidth());
   info_msg.height = static_cast<unsigned int>(imageHeight());
 
-  double principle_point_x = image_widht_2_ + 0.5;
+  double principle_point_x = image_width_2_ + 0.5;
   double principle_point_y = image_height_2_ + 0.5;
   double focal_length_pixel = focal_length_ / m_per_pixel_;
   info_msg.K[0] = info_msg.K[4] = focal_length_pixel;

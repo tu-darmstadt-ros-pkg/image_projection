@@ -25,7 +25,7 @@ private:
   // Projection parameters
   double m_per_pixel_;
   double focal_length_;
-  double image_widht_2_;
+  double image_width_2_;
   double image_height_2_;
 
   std::string virtual_sensor_optical_frame_;
