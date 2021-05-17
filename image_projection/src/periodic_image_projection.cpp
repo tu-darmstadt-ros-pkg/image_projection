@@ -101,6 +101,7 @@ void PeriodicImageProjection::poseCallback(const geometry_msgs::PoseConstPtr& po
 {
   boost::recursive_mutex::scoped_lock mutex_lock(reconfigure_mutex_);
   tf::poseMsgToEigen(*pose, virtual_sensor_pose_);
+  updateSensorPose(virtual_sensor_pose_);
   initProjectionMat();
   publishCameraFrameToTf();
 }
