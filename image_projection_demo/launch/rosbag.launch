@@ -5,7 +5,7 @@
 
   <!-- Play bag -->
   <param name="use_sim_time" value="true"/>
-  <node pkg="rosbag" type="play" name="rosbag_play" args="--clock $(arg bag_path)"/>
+  <node pkg="rosbag" type="play" name="rosbag_play" args="--clock -l $(arg bag_path)"/>
 
   <!-- Create tf -->
   <include file="$(find image_projection_demo)/launch/tf.launch"/>
