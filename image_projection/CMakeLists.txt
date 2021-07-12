@@ -13,7 +13,6 @@ find_package(catkin REQUIRED COMPONENTS
   eigen_conversions
   image_transport
   image_projection_msgs
-  tf2_geometry_msgs
   image_projection_plugin_interface
   dynamic_reconfigure
 )
@@ -38,7 +37,6 @@ catkin_package(
     roscpp
     sensor_msgs
     tf2_ros
-    tf2_geometry_msgs
     eigen_conversions
     image_projection_msgs
     image_projection_plugin_interface

@@ -13,7 +13,6 @@
 #include <kalibr_camera_loader/camera_loader.h>
 
 #include <tf2_ros/transform_listener.h>
-#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 
 #include <eigen_conversions/eigen_msg.h>
 
