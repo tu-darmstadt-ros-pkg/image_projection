@@ -7,7 +7,6 @@ add_compile_options(-std=c++11)
 find_package(catkin REQUIRED COMPONENTS
   kalibr_camera_loader
   nodelet
-  pcl_ros
   roscpp
   sensor_msgs
   tf2_ros
@@ -37,7 +36,6 @@ catkin_package(
   CATKIN_DEPENDS
     kalibr_camera_loader
     nodelet
-    pcl_ros
     roscpp
     sensor_msgs
     tf2_ros
