@@ -10,7 +10,6 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   sensor_msgs
   tf2_ros
-  tf_conversions
   eigen_conversions
   image_transport
   image_projection_msgs
@@ -40,7 +39,6 @@ catkin_package(
     sensor_msgs
     tf2_ros
     tf2_geometry_msgs
-    tf_conversions
     eigen_conversions
     image_projection_msgs
     image_projection_plugin_interface

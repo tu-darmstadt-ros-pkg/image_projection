@@ -15,7 +15,6 @@
   <depend>sensor_msgs</depend>
   <depend>tf2_ros</depend>
   <depend>tf2_geometry_msgs</depend>
-  <depend>tf_conversions</depend>
   <depend>kalibr_camera_loader</depend>
   <depend>eigen_conversions</depend>
   <depend>image_projection_msgs</depend>
