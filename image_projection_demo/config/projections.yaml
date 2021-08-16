@@ -8,8 +8,8 @@ $(arg camera_name)_pinhole_front:
   virtual_sensor_optical_frame: pinhole_front_optical_frame
   projection_type: image_projection_plugins::PinholeProjection
   projection_parameters:
-    image_width: 512
-    image_height: 256
+    image_width: 1024
+    image_height: 512
     horizontal_fov: 130
     focal_length: 1
 
@@ -20,10 +20,10 @@ $(arg camera_name)_mercator_projection:
   pose: [0, 0, 0, 0, 0, 3.141592]
   projection_type: image_projection_plugins::MercatorProjection
   projection_parameters:
-    image_width: 643
+    image_width: 1024
     image_height: 512
     cylinder_radius: 1.0
-    vertical_fov: 136
+    vertical_fov: 110
   
 # Ideal fisheye
 $(arg camera_name)_left_fisheye:
