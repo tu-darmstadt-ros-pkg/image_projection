@@ -38,6 +38,18 @@ Low cost 360° camera with two fisheye lenses pointing in opposite directions
 | ![](image_projection_demo/doc/demo_spot_left_raw.gif) | ![](image_projection_demo/doc/demo_spot_right_raw.gif) | | |
 | ![](image_projection_demo/doc/demo_spot_back_raw.gif) | | | |
 
+## Citation
+Please cite our paper if you use this software as part of your scientific publication:
+
+```
+@INPROCEEDINGS{oehler2021flexible,
+  author={Oehler, Martin and von Stryk, Oskar},
+  booktitle={2021 European Conference on Mobile Robots (ECMR)}, 
+  title={A Flexible Framework for Virtual Omnidirectional Vision to Improve Operator Situation Awareness}, 
+  year={2021}
+}
+```
+
 ## Installation
 If you haven't already installed it, [install ROS](http://wiki.ros.org/noetic/Installation/Ubuntu). Please use **Desktop-Full Install** to run the demo. Noetic is officially supported, but Melodic and Kinetic should work as well.
 
