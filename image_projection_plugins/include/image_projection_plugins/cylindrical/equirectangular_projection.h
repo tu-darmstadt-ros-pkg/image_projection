@@ -13,8 +13,7 @@ protected:
   bool loadProjectionParametersFromNamespace(const ros::NodeHandle& nh) override;
   void parametersChanged() override;
 private:
-  double angle_lat_step_;
-  double angle_long_step_;
+  double angle_step_;
   double cylinder_radius_;
   double vertical_fov_rad_2_;
 };
