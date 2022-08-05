@@ -29,7 +29,6 @@ Eigen::Vector3d MercatorProjection::targetImagePixelToProjectionSurfacePoint(con
 bool MercatorProjection::loadProjectionParametersFromNamespace(const ros::NodeHandle& nh)
 {
   registerParameterFromNamespace(nh, "cylinder_radius", 1.0, "Cylinder radius", 0, 10);
-  registerParameterFromNamespace(nh, "vertical_fov", 90, "Vertical field of view in degree", 0, 179);
   parametersChanged();
 
   return true;
@@ -38,7 +37,8 @@ bool MercatorProjection::loadProjectionParametersFromNamespace(const ros::NodeHa
 void MercatorProjection::parametersChanged()
 {
   cylinder_radius_ = getParameter("cylinder_radius");
-  double vertical_fov_rad = getParameter("vertical_fov") * M_PI / 180;
+  double vertical_fov_rad = 2 * M_PI * static_cast<double>(imageHeight()) / static_cast<double>(imageWidth());
+  ROS_INFO_STREAM("Vertical FOV: " << vertical_fov_rad * 180 / M_PI);
   double cylinder_height = 2 * cylinder_radius_ * std::tan(vertical_fov_rad / 2.0);
   height_step_ = cylinder_height / static_cast<double>(imageHeight());
   angle_step_ = 2*M_PI / static_cast<double>(imageWidth());

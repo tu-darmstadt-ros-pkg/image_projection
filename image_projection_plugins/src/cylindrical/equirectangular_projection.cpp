@@ -33,6 +33,7 @@ void EquirectangularProjection::parametersChanged()
 {
   cylinder_radius_ = getParameter("cylinder_radius");
   double vertical_fov_rad = 2 * M_PI * static_cast<double>(imageHeight()) / static_cast<double>(imageWidth());
+  ROS_INFO_STREAM("Vertical FOV: " << vertical_fov_rad * 180 / M_PI);
   angle_step_ = vertical_fov_rad / static_cast<double>(imageHeight());
 
   vertical_fov_rad_2_ = vertical_fov_rad / 2.0;
