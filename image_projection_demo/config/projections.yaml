@@ -21,9 +21,8 @@ $(arg camera_name)_mercator_projection:
   projection_type: image_projection_plugins::MercatorProjection
   projection_parameters:
     image_width: 1024
-    image_height: 512
+    image_height: 400
     cylinder_radius: 1.0
-    vertical_fov: 110
   
 # Ideal fisheye
 $(arg camera_name)_left_fisheye:
