@@ -1,18 +1,17 @@
 #ifndef IMAGE_PROJECTION_PLUGIN_INTERFACE_PROJECTIONS_PROJECTION_BASE_H
 #define IMAGE_PROJECTION_PLUGIN_INTERFACE_PROJECTIONS_PROJECTION_BASE_H
 
-#include <ros/ros.h>
+#include <rclcpp/rclcpp.hpp>
 #include <Eigen/Eigen>
-
-#include <ddynamic_reconfigure/ddynamic_reconfigure.h>
+#include <hector_ros2_utils/parameters/reconfigurable_parameter.hpp>
 
 namespace image_projection_plugin_interface {
 
 class ProjectionBase {
 public:
   virtual ~ProjectionBase();
-  virtual bool initialize(const ros::NodeHandle& nh, const ros::NodeHandle& pnh);
-  bool loadParametersFromNamespace(const ros::NodeHandle& nh);
+  virtual bool initialize(const rclcpp::Node::SharedPtr& node, const std::string& name);
+  bool loadParameters();
 
   bool mappingChanged() const;
   void unsetMappingChanged();
@@ -25,25 +24,30 @@ public:
   void setImageHeight(int image_height);
   int imageHeight() const;
 
-
 protected:
-  virtual bool loadProjectionParametersFromNamespace(const ros::NodeHandle& nh) = 0;
-  void registerParameter(const std::string& name, double value, const std::string& description, double min, double max);
-  void registerParameterFromNamespace(const ros::NodeHandle& nh, const std::string& name, double default_value, const std::string& description, double min, double max);
-  double getParameter(const std::string& name) const;
+  virtual bool loadProjectionParameters() = 0;
+
+  template<typename ParameterT>
+  void addReconfigurableParameter(const std::string &name, ParameterT &param, const std::string &description,
+    const hector::ReconfigurableParameterOptions<ParameterT> &options = {})
+  {
+    param_subscriptions_.push_back(hector::createReconfigurableParameter(
+      node_, name_ + "." + name, param, description, options));
+  }
+
   virtual void parametersChanged();
 private:
-  bool loadBaseParametersFromNamespace(const ros::NodeHandle& nh);
-  void reconfigureCallback(const std::string& name, double value);
-  void imageDimensionsReconfigureCallback(int* field, int value);
-  std::shared_ptr<ddynamic_reconfigure::DDynamicReconfigure> reconfigure_;
-  std::map<std::string, double> config_; /// Configuration parameters of the projection
-  bool mapping_changed_;
+  bool loadBaseParameters();
+
+  rclcpp::Node::SharedPtr node_;
+  bool mapping_changed_{true};
 
   // Parameters
-  int image_width_;
-  int image_height_;
-  bool frame_id_; /// Name of frame this projection is defined in
+  std::string name_; // Name of this plugin. Used as parameter namespace
+  int image_width_{0};
+  int image_height_{0};
+
+  std::vector<hector::ReconfigurableParameterSubscription> param_subscriptions_;
 
 };
 
