@@ -5,19 +5,25 @@
 
 namespace image_projection_plugins {
 
-class EquirectangularProjection : public image_projection_plugin_interface::ProjectionBase {
+class EquirectangularProjection : public image_projection_plugin_interface::ProjectionBase
+{
 public:
-  Eigen::Vector2d projectionSurfacePointToTargetImagePixel(const Eigen::Vector3d& point) const override;
-  Eigen::Vector3d targetImagePixelToProjectionSurfacePoint(const Eigen::Vector2d& target_image_pixel) const override;
+  [[nodiscard]] Eigen::Vector2d projectionSurfacePointToTargetImagePixel(const Eigen::Vector3d& point) const override;
+  [[nodiscard]] Eigen::Vector3d
+  targetImagePixelToProjectionSurfacePoint(const Eigen::Vector2d& target_image_pixel) const override;
+
 protected:
-  bool loadProjectionParametersFromNamespace(const ros::NodeHandle& nh) override;
-  void parametersChanged() override;
+  bool loadProjectionParameters() override;
+  void onParametersChanged() override;
+
 private:
-  double angle_step_;
-  double cylinder_radius_;
-  double vertical_fov_rad_2_;
+  // Parameters
+  double cylinder_radius_{1};
+
+  double angle_step_{0};
+  double vertical_fov_rad_2_{0};
 };
 
-}
+}  // namespace image_projection_plugins
 
 #endif

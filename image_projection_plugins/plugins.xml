@@ -1,4 +1,4 @@
-<library path="lib/libimage_projection_plugins">
+<library path="image_projection_plugins">
   <class type="image_projection_plugins::PinholeProjection" base_class_type="image_projection_plugin_interface::ProjectionBase">
     <description>Pinhole projection plugin</description>
   </class>

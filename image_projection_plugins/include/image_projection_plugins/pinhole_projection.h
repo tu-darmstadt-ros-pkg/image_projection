@@ -2,35 +2,38 @@
 #define IMAGE_PROJECTION_PLUGINS_PINHOLE_PROJECTION_H
 
 #include <image_projection_plugin_interface/projection_base.h>
-#include <sensor_msgs/CameraInfo.h>
+#include <sensor_msgs/msg/camera_info.hpp>
 
 namespace image_projection_plugins {
 
-class PinholeProjection : public image_projection_plugin_interface::ProjectionBase {
+class PinholeProjection : public image_projection_plugin_interface::ProjectionBase
+{
 public:
-  virtual bool initialize(const ros::NodeHandle &nh, const ros::NodeHandle &pnh) override;
-  virtual Eigen::Vector2d projectionSurfacePointToTargetImagePixel(const Eigen::Vector3d& point) const override;
-  virtual Eigen::Vector3d targetImagePixelToProjectionSurfacePoint(const Eigen::Vector2d& target_image_pixel) const override;
-protected:
-  virtual bool loadProjectionParametersFromNamespace(const ros::NodeHandle& nh) override;
-private:
-  virtual void parametersChanged() override;
-  void publishCameraInfo();
-  sensor_msgs::CameraInfo parametersToCameraInfo() const;
+  bool initialize(const rclcpp::Node::SharedPtr& node, const std::string& name) override;
+  Eigen::Vector2d projectionSurfacePointToTargetImagePixel(const Eigen::Vector3d& point) const override;
+  Eigen::Vector3d targetImagePixelToProjectionSurfacePoint(const Eigen::Vector2d& target_image_pixel) const override;
 
-  ros::NodeHandle nh_;
-  ros::NodeHandle pnh_;
-  ros::Publisher camera_info_pub_;
+protected:
+  bool loadProjectionParameters() override;
+
+private:
+  void onParametersChanged() override;
+  void publishCameraInfo() const;
+  sensor_msgs::msg::CameraInfo parametersToCameraInfo() const;
+
+  rclcpp::Publisher<sensor_msgs::msg::CameraInfo>::SharedPtr camera_info_pub_;
 
   // Projection parameters
-  double m_per_pixel_;
-  double focal_length_;
-  double image_width_2_;
-  double image_height_2_;
+  double focal_length_{1};
+  double horizontal_fov{90};
+
+  double m_per_pixel_{0};
+  double image_width_2_{0};
+  double image_height_2_{0};
 
   std::string virtual_sensor_optical_frame_;
 };
 
-}
+}  // namespace image_projection_plugins
 
 #endif

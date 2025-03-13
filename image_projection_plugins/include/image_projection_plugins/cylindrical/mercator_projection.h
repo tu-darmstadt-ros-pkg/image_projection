@@ -5,20 +5,25 @@
 
 namespace image_projection_plugins {
 
-class MercatorProjection : public image_projection_plugin_interface::ProjectionBase {
+class MercatorProjection : public image_projection_plugin_interface::ProjectionBase
+{
 public:
-  virtual Eigen::Vector2d projectionSurfacePointToTargetImagePixel(const Eigen::Vector3d& point) const override;
-  virtual Eigen::Vector3d targetImagePixelToProjectionSurfacePoint(const Eigen::Vector2d& target_image_pixel) const override;
+  Eigen::Vector2d projectionSurfacePointToTargetImagePixel(const Eigen::Vector3d& point) const override;
+  Eigen::Vector3d targetImagePixelToProjectionSurfacePoint(const Eigen::Vector2d& target_image_pixel) const override;
+
 protected:
-  virtual bool loadProjectionParametersFromNamespace(const ros::NodeHandle& nh) override;
-  virtual void parametersChanged() override;
+  bool loadProjectionParameters() override;
+  void onParametersChanged() override;
+
 private:
-  double height_step_;
-  double angle_step_;
-  double cylinder_radius_;
-  double image_height_2_;
+  // Parameters
+  double cylinder_radius_{1.0};
+
+  double height_step_{0};
+  double angle_step_{0};
+  double image_height_2_{0};
 };
 
-}
+}  // namespace image_projection_plugins
 
 #endif
