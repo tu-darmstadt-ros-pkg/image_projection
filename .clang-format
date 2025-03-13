@@ -1,0 +1,71 @@
+# Base Style
+BasedOnStyle: LLVM
+
+# Indentation
+IndentWidth: 2
+TabWidth: 2
+UseTab: Never
+IndentCaseLabels: true
+IndentPPDirectives: AfterHash
+NamespaceIndentation: None
+
+# Brace Wrapping
+BraceWrapping:
+  AfterClass: true
+  AfterControlStatement: false
+  AfterEnum: true
+  AfterFunction: true
+  AfterNamespace: false
+  AfterStruct: true
+  BeforeCatch: true
+  BeforeElse: false
+  IndentBraces: false
+  SplitEmptyFunction: false
+BreakBeforeBraces: Custom
+
+# Line Breaking
+ColumnLimit: 120
+BreakTemplateDeclarations: Yes
+AlwaysBreakBeforeMultilineStrings: false
+BreakBeforeBinaryOperators: None
+BreakBeforeTernaryOperators: false
+
+# Penalties
+PenaltyExcessCharacter: 50
+PenaltyBreakBeforeFirstCallParameter: 30
+PenaltyBreakComment: 1000
+PenaltyBreakFirstLessLess: 10
+PenaltyBreakString: 100
+PenaltyReturnTypeOnItsOwnLine: 50
+
+# Spacing
+SpacesInSquareBrackets: false
+SpaceBeforeParens: ControlStatements
+PointerAlignment: Left
+SpacesBeforeTrailingComments: 2
+SpacesInParentheses: false
+SpacesInAngles: false
+SpaceInEmptyParentheses: false
+SpacesInCStyleCastParentheses: false
+SpaceAfterCStyleCast: true
+SpaceBeforeAssignmentOperators: true
+
+# Short Constructs Formatting
+AllowShortBlocksOnASingleLine: Always
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortCaseLabelsOnASingleLine: false
+
+# Constructor Initializers
+PackConstructorInitializers: NextLineOnly
+
+# Include Sorting
+SortIncludes: Never
+
+# Comment Formatting
+AlignTrailingComments: true
+ReflowComments: true
+
+# Miscellaneous
+MaxEmptyLinesToKeep: 1
