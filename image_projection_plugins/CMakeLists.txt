@@ -47,7 +47,6 @@ install(DIRECTORY include/ DESTINATION include)
 install(FILES plugins.xml DESTINATION share/${PROJECT_NAME}
 )
 
-ament_export_targets(${PROJECT_NAME}-targets)
-ament_export_include_directories(include)
+ament_export_targets(${PROJECT_NAME}-targets HAS_LIBRARY_TARGET)
 ament_export_dependencies(${DEPENDENCIES})
 ament_package()
