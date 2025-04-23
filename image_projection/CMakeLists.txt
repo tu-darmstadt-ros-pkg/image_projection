@@ -141,7 +141,6 @@ install(DIRECTORY include/ DESTINATION include)
 
 install(DIRECTORY 
   config
-  cfg
   DESTINATION share/${PROJECT_NAME}
 )
 
