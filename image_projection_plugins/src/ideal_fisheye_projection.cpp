@@ -41,10 +41,10 @@ bool IdealFisheyeProjection::loadProjectionParameters()
 {
   addReconfigurableParameter(
       "sphere_radius", sphere_radius_, "Radius of the (virtual) fisheye sphere (in m)",
-      hector::ReconfigurableParameterOptions<double>().onValidate([](const auto& value) { return value > 0; }));
+      hector::ParameterOptions<double>().onValidate([](const auto& value) { return value > 0; }));
   addReconfigurableParameter(
       "fov", fov_rad_, "Fisheye horizontal and vertical field of view (in deg)",
-      hector::ReconfigurableParameterOptions<double>().onValidate([](const auto& value) { return value > 0; }));
+      hector::ParameterOptions<double>().onValidate([](const auto& value) { return value > 0; }));
   return true;
 }
 

@@ -8,6 +8,7 @@ ProjectionBase::~ProjectionBase() = default;
 
 bool ProjectionBase::initialize(const rclcpp::Node::SharedPtr& node, const std::string& name)
 {
+  // TODO try with sub_nodes?
   node_ = node;
   name_ = name;
 
@@ -80,11 +81,11 @@ bool ProjectionBase::loadBaseParameters()
   bool success = true;  // TODO make parameters mandatory
   addReconfigurableParameter(
       "image_width", image_width_, "Output image width",
-      hector::ReconfigurableParameterOptions<int>().onValidate([](const auto& value) { return value > 0; }));
+      hector::ParameterOptions<int>().onValidate([](const auto& value) { return value > 0; }));
 
   addReconfigurableParameter(
       "image_height", image_height_, "Output image height",
-      hector::ReconfigurableParameterOptions<int>().onValidate([](const auto& value) { return value > 0; }));
+      hector::ParameterOptions<int>().onValidate([](const auto& value) { return value > 0; }));
 
   return success;
 }

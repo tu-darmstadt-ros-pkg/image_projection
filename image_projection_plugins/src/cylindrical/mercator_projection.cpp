@@ -30,7 +30,7 @@ bool MercatorProjection::loadProjectionParameters()
 {
   addReconfigurableParameter(
       "cylinder_radius", cylinder_radius_, "Radius of the cylinder used as the projection surface",
-      hector::ReconfigurableParameterOptions<double>().onValidate([](const auto& value) { return value > 0; }));
+      hector::ParameterOptions<double>().onValidate([](const auto& value) { return value > 0; }));
 
   return true;
 }

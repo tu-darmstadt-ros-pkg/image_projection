@@ -1,0 +1,10 @@
+launch:
+  - node:
+      pkg: image_projection
+      exec: periodic_image_projection_standalone_node
+      name: my_node
+      param:
+        - name: "projection_type"
+          value: "image_projection_plugins::EquirectangularProjection"
+        - name: "base_frame"
+          value: "base_link"

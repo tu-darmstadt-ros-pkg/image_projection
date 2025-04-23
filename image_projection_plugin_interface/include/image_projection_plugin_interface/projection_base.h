@@ -37,10 +37,10 @@ protected:
 
   template <typename ParameterT>
   void addReconfigurableParameter(const std::string& name, ParameterT& param, const std::string& description,
-                                  const hector::ReconfigurableParameterOptions<ParameterT>& options = {})
+                                  const hector::ParameterOptions<ParameterT>& options = {})
   {
     param_subscriptions_.push_back(
-        hector::createReconfigurableParameter(node_, name_ + "." + name, param, description, options));
+        hector::createReconfigurableParameter(node_, name_ + "." + name, std::ref(param), description, options));
   }
 
   /**
@@ -61,7 +61,7 @@ private:
   int image_width_{0};
   int image_height_{0};
 
-  std::vector<hector::ReconfigurableParameterSubscription> param_subscriptions_;
+  std::vector<hector::ParameterSubscription> param_subscriptions_;
   rclcpp::node_interfaces::PostSetParametersCallbackHandle::SharedPtr parameter_cb_handle_;
 };
 }  // namespace image_projection_plugin_interface

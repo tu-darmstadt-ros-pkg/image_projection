@@ -9,7 +9,8 @@ bool PinholeProjection::initialize(const rclcpp::Node::SharedPtr& node, const st
   addReconfigurableParameter("virtual_sensor_optical_frame", virtual_sensor_optical_frame_,
                              "Name of the optical frame to be published for the virtual camera.");
   if (!virtual_sensor_optical_frame_.empty()) {
-    camera_info_pub_ = node_->create_publisher<sensor_msgs::msg::CameraInfo>("camera_info", 10);  // TODO transient local
+    auto qos = rclcpp::QoS(10).transient_local();
+    camera_info_pub_ = node_->create_publisher<sensor_msgs::msg::CameraInfo>("camera_info", qos);  // TODO transient local
   }
   return true;
 }
@@ -40,9 +41,9 @@ bool PinholeProjection::loadProjectionParameters()
 {
   addReconfigurableParameter(
       "focal_length", focal_length_, "Focal length of the virtual camera (in m)",
-      hector::ReconfigurableParameterOptions<double>().onValidate([](const auto& value) { return value > 0; }));
+      hector::ParameterOptions<double>().onValidate([](const auto& value) { return value > 0; }));
   addReconfigurableParameter("horizontal_fov", horizontal_fov, "Horizontal field of view (in degree)",
-                             hector::ReconfigurableParameterOptions<double>().onValidate(
+                             hector::ParameterOptions<double>().onValidate(
                                  [](const auto& value) { return value > 0 && value < 180; }));
 
   return true;

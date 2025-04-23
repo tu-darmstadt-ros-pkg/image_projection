@@ -9,26 +9,28 @@ INIT_TIMING
 
 namespace image_projection {
 
-ImageProjection::ImageProjection(const ros::NodeHandle& nh, const ros::NodeHandle& pnh)
-  : nh_(nh), projection_loader_("image_projection_plugin_interface", "image_projection_plugin_interface::ProjectionBase"), camera_loader_(nh, pnh), use_opencl_(true) {
+ImageProjection::ImageProjection(const rclcpp::Node::SharedPtr node)
+  : node_(node), projection_loader_("image_projection_plugin_interface", "image_projection_plugin_interface::ProjectionBase"), camera_loader_(node), use_opencl_(true) {
 
-  tf_buffer_.reset(new tf2_ros::Buffer());
+  tf_buffer_.reset(new tf2_ros::Buffer(node_->get_clock()));
   tf_listener_.reset(new tf2_ros::TransformListener(*tf_buffer_));
 
   // Load parameters
-  pnh.param<std::string>("save_folder", save_folder_, "");
-  ROS_INFO_STREAM("Save folder: " << save_folder_);
+  node_->declare_parameter("save_folder", std::string(""));
+  node_->get_parameter("save_folder", save_folder_);
+  RCLCPP_INFO_STREAM(node_->get_logger(), "Save folder: " << save_folder_);
 
   // Use OpenCL
-  pnh.param("use_opencl", use_opencl_, false);
+  node_->declare_parameter("use_opencl", false);
+  node_->get_parameter("use_opencl", use_opencl_);
   cv::ocl::setUseOpenCL(use_opencl_);
   if (use_opencl_) {
-    ROS_INFO_STREAM("OpenCL: " << cv::ocl::haveOpenCL());
+    RCLCPP_INFO_STREAM(node_->get_logger(), "OpenCL: " << cv::ocl::haveOpenCL());
     std::vector<cv::ocl::PlatformInfo> platform_info;
     cv::ocl::getPlatfomsInfo(platform_info);
     for (const auto & i : platform_info)
     {
-        ROS_INFO_STREAM(
+        RCLCPP_INFO_STREAM(node_->get_logger(),
             "\tName: " << i.name() << std::endl
             << "\tVendor: " << i.vendor() << std::endl
             << "\tVersion: " << i.version() << std::endl
@@ -49,40 +51,39 @@ ProjectionPtr ImageProjection::loadProjectionPlugin(const std::string& projectio
     image_projection_plugin_interface::ProjectionBase* projection_ptr = projection_loader_.createUnmanagedInstance(projection_name);
     projection.reset(projection_ptr, std::bind(&ProjectionClassLoader::unloadLibraryForClass, &projection_loader_, projection_name));
   } catch (pluginlib::PluginlibException& ex) {
-    ROS_ERROR_STREAM("The plugin failed to load: " << ex.what());
+    RCLCPP_ERROR_STREAM(node_->get_logger(), "The plugin failed to load: " << ex.what());
   }
   return projection;
 }
 
-PixelMapping ImageProjection::createMapping(const ProjectionPtr& projection, const std::string& base_frame, const ros::Time& stamp, const Eigen::Isometry3d& sensor_pose) const {
+PixelMapping ImageProjection::createMapping(const ProjectionPtr& projection, const std::string& base_frame, const rclcpp::Time& stamp, const Eigen::Isometry3d& sensor_pose) const {
   PixelMapping pixel_mapping_umat;
   if (!projection) {
-    ROS_ERROR_STREAM("ProjectionPtr is none");
+    RCLCPP_ERROR_STREAM(node_->get_logger(), "ProjectionPtr is none");
     return pixel_mapping_umat;
   }
   START_TIMING("mapping")
-  ROS_INFO_STREAM("Creating mapping");
-  cv::Mat distance(projection->imageHeight(), projection->imageWidth(), CV_64F, kalibr_image_geometry::INVALID);
+  RCLCPP_INFO_STREAM(node_->get_logger(), "Creating mapping");
+  cv::Mat distance(projection->imageHeight(), projection->imageWidth(), CV_64F, extended_image_geometry::INVALID);
   std::unordered_map<std::string, std::pair<cv::Mat, cv::Mat>> pixel_mapping;
-  for (const kalibr_image_geometry::CameraPtr& cam: camera_loader_.cameras()) {
+  for (const extended_image_geometry::CameraPtr& cam: camera_loader_.cameras()) {
     // Get transform to camera frame
     std::string cam_frame_id;
-    if (!cam->model().cameraInfo().frame_id.empty()) {
-      cam_frame_id = cam->model().cameraInfo().frame_id;
+    if (!cam->model().cameraInfo()->frame_id.empty()) {
+      cam_frame_id = cam->model().cameraInfo()->frame_id;
     } else {
-      cam_frame_id = cam->model().cameraInfo().header.frame_id;
+      cam_frame_id = cam->model().cameraInfo()->header.frame_id;
     }
 
-    ROS_INFO_STREAM("Waiting for transformation from '" << base_frame << "' to '" << cam_frame_id << "' ..");
-    geometry_msgs::TransformStamped transform;
+    RCLCPP_INFO_STREAM(node_->get_logger(), "Waiting for transformation from '" << base_frame << "' to '" << cam_frame_id << "' ..");
+    geometry_msgs::msg::TransformStamped transform;
     try {
-      transform = tf_buffer_->lookupTransform(cam_frame_id, base_frame, stamp, ros::Duration(1));
+      transform = tf_buffer_->lookupTransform(cam_frame_id, base_frame, stamp, rclcpp::Duration(1, 0));
     } catch (const tf2::TransformException& e) {
-      ROS_WARN_STREAM("LookupTransform failed. Reason: " << e.what());
+      RCLCPP_WARN_STREAM(node_->get_logger(), "LookupTransform failed. Reason: " << e.what());
       return PixelMapping();
     }
-    Eigen::Isometry3d cam_to_world;
-    tf::transformMsgToEigen(transform.transform, cam_to_world);
+    Eigen::Isometry3d cam_to_world = tf2::transformToEigen(transform.transform);
     Eigen::Isometry3d sensor_to_world = cam_to_world * sensor_pose;
 
     // Iterate over every pixel of projection image
@@ -133,20 +134,20 @@ PixelMapping ImageProjection::createMapping(const ProjectionPtr& projection, con
   }
 
   STOP_TIMING_AVG
-  ROS_INFO_STREAM("Mapping finished.");
+  RCLCPP_INFO_STREAM(node_->get_logger(), "Mapping finished.");
   return pixel_mapping_umat;
 }
 
-std::map<std::string, cv_bridge::CvImageConstPtr> ImageProjection::getLatestImages(ros::Time& stamp, std::string& encoding) const
+std::map<std::string, cv_bridge::CvImageConstPtr> ImageProjection::getLatestImages(rclcpp::Time& stamp, std::string& encoding) const
 {
   // Retrieve images from all cams
   // TODO: lock image retrieval
-  std::map<std::string, sensor_msgs::ImageConstPtr> images;
+  std::map<std::string, std::shared_ptr<sensor_msgs::msg::Image const>> images;
   std::vector<uint64_t> stamps;
-  for (const kalibr_image_geometry::CameraPtr& cam: camera_loader_.cameras()) {
-    const sensor_msgs::ImageConstPtr& image = cam->getLastImage();
+  for (const extended_image_geometry::CameraPtr& cam: camera_loader_.cameras()) {
+    const std::shared_ptr<sensor_msgs::msg::Image const> image = cam->getLastImage();
     if (image) {
-      stamps.push_back(image->header.stamp.toNSec());
+      stamps.push_back(image->header.stamp.nanosec);
       images[cam->getName()] = image;
     }
   }
@@ -165,7 +166,7 @@ std::map<std::string, cv_bridge::CvImageConstPtr> ImageProjection::getLatestImag
   // Convert to cv
   for (const auto& image: images) {
     if (image.second->encoding != encoding) {
-      ROS_WARN_STREAM_ONCE("Image of camera '" << image.first << "' does not match desired encoding '" << encoding << "'. Image data is copied. This warning is printed only once.");
+      RCLCPP_WARN_STREAM_ONCE(node_->get_logger(), "Image of camera '" << image.first << "' does not match desired encoding '" << encoding << "'. Image data is copied. This warning is printed only once.");
     }
     try
     {
@@ -173,20 +174,21 @@ std::map<std::string, cv_bridge::CvImageConstPtr> ImageProjection::getLatestImag
     }
     catch(cv_bridge::Exception& e)
     {
-      ROS_ERROR_STREAM("CV Bridge conversion failed: " << e.what());
+      RCLCPP_ERROR_STREAM(node_->get_logger(), "CV Bridge conversion failed: " << e.what());
     }
   }
 
   // Compute average stamp
   std::transform(begin(stamps), end(stamps), begin(stamps), [stamps](uint64_t& x){return x/stamps.size();});
-  stamp.fromNSec(std::accumulate(begin(stamps), end(stamps), 0ul));
+  //stamp.fromNSec(std::accumulate(begin(stamps), end(stamps), 0ul));
+  stamp = rclcpp::Time(std::accumulate(begin(stamps), end(stamps), 0ul));
   return cv_images;
 }
 
 bool ImageProjection::projectImages(const std::map<std::string, cv_bridge::CvImageConstPtr>& images, const PixelMapping& pixel_mapping, cv::UMat& projection) const
 {
   if (images.empty()) {
-    ROS_WARN_STREAM_THROTTLE(1, "No cam image received yet. Can't project. This message is throttled.");
+    RCLCPP_WARN_STREAM_THROTTLE(node_->get_logger(), *(node_->get_clock()), 1000, "No cam image received yet. Can't project. This message is throttled.");
     return false;
   }
   START_TIMING("project")
@@ -199,7 +201,7 @@ bool ImageProjection::projectImages(const std::map<std::string, cv_bridge::CvIma
       cv::remap(image, projection, mapping_entry.first, mapping_entry.second, cv::INTER_LINEAR, cv::BORDER_TRANSPARENT);
 
     } catch (std::out_of_range&) {
-      ROS_ERROR_STREAM("No mapping available for camera '" << cam_name << "'.");
+      RCLCPP_ERROR_STREAM(node_->get_logger(), "No mapping available for camera '" << cam_name << "'.");
       return false;
       STOP_TIMING_AVG
     }
@@ -214,7 +216,7 @@ bool ImageProjection::projectImages(const std::map<std::string, cv_bridge::CvIma
     oss << std::put_time(&tm, "%d-%m-%Y_%H-%M-%S");
     std::string time_str = oss.str();
 
-    ROS_INFO_STREAM("Saving image to: " << save_folder_ << "/projection_" << time_str << ".jpg");
+    RCLCPP_INFO_STREAM(node_->get_logger(), "Saving image to: " << save_folder_ << "/projection_" << time_str << ".jpg");
     cv::UMat bgr_img;
     cv::cvtColor(projection, bgr_img, cv::COLOR_RGB2BGR);
     cv::imwrite(save_folder_ + "/projection_" + time_str + ".jpg", bgr_img);
@@ -224,13 +226,13 @@ bool ImageProjection::projectImages(const std::map<std::string, cv_bridge::CvIma
   return true;
 }
 
-bool ImageProjection::projectLatestImages(const PixelMapping& pixel_mapping, cv::UMat& projection, ros::Time& stamp, std::string& encoding) const
+bool ImageProjection::projectLatestImages(const PixelMapping& pixel_mapping, cv::UMat& projection, rclcpp::Time& stamp, std::string& encoding) const
 {
   auto images = getLatestImages(stamp, encoding);
   return projectImages(images, pixel_mapping, projection);
 }
 
-kalibr_image_geometry::CameraLoader& ImageProjection::getCameraLoader()
+extended_image_geometry::CameraLoader& ImageProjection::getCameraLoader()
 {
   return camera_loader_;
 }

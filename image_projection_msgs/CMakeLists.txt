@@ -1,13 +1,12 @@
-cmake_minimum_required(VERSION 3.0.2)
+cmake_minimum_required(VERSION 3.8)
 project(image_projection_msgs)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS
-  message_generation
-  geometry_msgs
-)
+find_package(ament_cmake REQUIRED)
+find_package(rosidl_default_generators REQUIRED)
+find_package(geometry_msgs REQUIRED)
 
 
 ################################################
@@ -22,9 +21,8 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate services in the 'srv' folder
-add_service_files(
-  FILES
-  ProjectPixelTo3DRay.srv
+set(srv_files
+  "srv/ProjectPixelTo3DRay.srv"
 )
 
 ## Generate actions in the 'action' folder
@@ -35,9 +33,9 @@ add_service_files(
 # )
 
 ## Generate added messages and services with any dependencies listed here
-generate_messages(
-  DEPENDENCIES
-  geometry_msgs  # Or other packages containing msgs
+rosidl_generate_interfaces(${PROJECT_NAME}
+  ${srv_files}
+  DEPENDENCIES geometry_msgs
 )
 
 ################################################
@@ -69,23 +67,13 @@ generate_messages(
 ## LIBRARIES: libraries you create in this project that dependent projects also need
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
-catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES image_projection_msgs
-  CATKIN_DEPENDS message_runtime
-#  DEPENDS system_lib
-)
+ament_export_dependencies(rosidl_default_runtime)
+
+ament_package()
 
 ###########
 ## Build ##
 ###########
-
-## Specify additional locations of header files
-## Your package locations should be listed before other locations
-include_directories(
-# include
-  ${catkin_INCLUDE_DIRS}
-)
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}

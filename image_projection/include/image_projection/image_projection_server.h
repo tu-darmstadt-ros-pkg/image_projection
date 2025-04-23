@@ -1,18 +1,16 @@
 #ifndef IMAGE_PROJECTION_IMAGE_PROJECTION_SERVER_H
 #define IMAGE_PROJECTION_IMAGE_PROJECTION_SERVER_H
 
-#include <ros/ros.h>
+#include <rclcpp/rclcpp.hpp>
 
 namespace image_projection {
 
-class ImageProjectionServer {
+class ImageProjectionServer : public rclcpp::Node {
 public:
-  ImageProjectionServer(const ros::NodeHandle& nh, const ros::NodeHandle& pnh);
+  ImageProjectionServer(const rclcpp::NodeOptions& options);
 private:
-  ros::NodeHandle nh_;
-  ros::NodeHandle pnh_;
 
-  ros::ServiceServer projection_srv_;
+  //rclcpp::Service<>::SharedPtr projection_srv_;
 
 };
 

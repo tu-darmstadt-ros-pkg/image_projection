@@ -1,54 +1,51 @@
 #ifndef IMAGE_PROJECTION_PERIODIC_IMAGE_PROJECTION_H
 #define IMAGE_PROJECTION_PERIODIC_IMAGE_PROJECTION_H
 
-#include <ros/ros.h>
-#include <image_transport/image_transport.h>
-#include <dynamic_reconfigure/server.h>
-#include <geometry_msgs/Pose.h>
+#include <rclcpp/rclcpp.hpp>
+#include <image_transport/image_transport.hpp>
+//#include <dynamic_reconfigure/server.h>
+#include <geometry_msgs/msg/pose.hpp>
 #include <tf2_ros/transform_broadcaster.h>
+#include <hector_ros2_utils/parameters/reconfigurable_parameter.hpp>
 
-#include <image_projection_msgs/ProjectPixelTo3DRay.h>
+#include <image_projection_msgs/srv/project_pixel_to3_d_ray.hpp>
 
-#include <image_projection/ProjectionConfig.h>
+//#include <image_projection/ProjectionConfig.h>
 #include <image_projection/image_projection.h>
 
 namespace image_projection {
 
 class PeriodicImageProjection {
 public:
-  PeriodicImageProjection(const ros::NodeHandle& nh, const ros::NodeHandle& pnh);
+  PeriodicImageProjection(const rclcpp::Node::SharedPtr node);
   bool init();
   void initProjectionMat();
   void projectAndPublishLatestImages();
 private:
   void connectCb();
-  void dynamicReconfigureCallback(ProjectionConfig &config, uint32_t /*level*/);
-  void poseCallback(const geometry_msgs::PoseConstPtr& pose);
+  void poseParamCallback(std::vector<double> pose_vec);
+  void poseCallback(const std::shared_ptr<geometry_msgs::msg::Pose const> pose);
   void updateSensorPose(const Eigen::Isometry3d& sensor_pose);
   void updateSensorPose(double x, double y, double z, double roll, double pitch, double yaw);
   void updateReconfigureConfig(const std::vector<double>& pose_vec);
-  bool projectPixelToRayCb(image_projection_msgs::ProjectPixelTo3DRay::Request& req, image_projection_msgs::ProjectPixelTo3DRay::Response &resp);
-  void publishTfTimerCallback(const ros::TimerEvent& /*event*/);
+  bool projectPixelToRayCb(const image_projection_msgs::srv::ProjectPixelTo3DRay::Request::SharedPtr req, image_projection_msgs::srv::ProjectPixelTo3DRay::Response::SharedPtr resp);
+  void publishTfTimerCallback();
   void publishCameraFrameToTf();
 
-  // Node handles
-  ros::NodeHandle nh_;
-  ros::NodeHandle pnh_;
-
+  // Node
+  rclcpp::Node::SharedPtr node_;
   bool enabled_;
 
-  // Dynamic reconfigure
-  std::shared_ptr<dynamic_reconfigure::Server<image_projection::ProjectionConfig>> reconfigure_server_;
-  boost::recursive_mutex reconfigure_mutex_;
-  ros::Subscriber pose_sub_;
-  ros::ServiceServer pixel_to_ray_srv_;
+  std::recursive_mutex reconfigure_mutex_;
+  rclcpp::Subscription<geometry_msgs::msg::Pose>::SharedPtr pose_sub_;
+  rclcpp::Service<image_projection_msgs::srv::ProjectPixelTo3DRay>::SharedPtr pixel_to_ray_srv_;
 
   // TF
   bool publish_tf_;
-  tf2_ros::TransformBroadcaster tf_broadcaster_;
-  ros::Timer tf_timer_;
-  geometry_msgs::TransformStamped optical_transform_msg_;
-  ros::Time last_tf_stamp_;
+  std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
+  rclcpp::TimerBase::SharedPtr tf_timer_;
+  geometry_msgs::msg::TransformStamped optical_transform_msg_;
+  rclcpp::Time last_tf_stamp_;
 
   // Image projection
   ImageProjection image_projection_lib_;
@@ -59,7 +56,11 @@ private:
   // Image publisher
   image_transport::ImageTransport it_;
   image_transport::Publisher image_pub_;
-  boost::mutex connect_mutex_;
+  std::mutex connect_mutex_;
+
+  // Parameter Subscription for pose
+  hector::ParameterSubscription pose_param_sub_;
+  std::vector<double> pose_vec_;
 
   // Parameters
   std::string base_frame_;
@@ -70,6 +71,9 @@ private:
   Eigen::Isometry3d optical_frame_transform_;
   std::string encoding_;
   bool always_recompute_mapping_;
+
+  // TODO remove once image transport adds callback to advertise
+  rclcpp::TimerBase::SharedPtr connection_check_timer_;
 };
 
 }

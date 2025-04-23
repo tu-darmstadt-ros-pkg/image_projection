@@ -1,7 +1,7 @@
 #ifndef TIMING_H
 #define TIMING_H
 
-#include <ros/ros.h>
+#include <rclcpp/rclcpp.hpp>
 
 #include <iostream>
 #include <sstream>
@@ -121,7 +121,7 @@ namespace timing {
         double t = elapsed_seconds.count() * 1000.0;
 
         if (print)
-          ROS_INFO_STREAM("Time '" << tp.name.c_str() << "': " << t << " ms");
+          RCLCPP_INFO_STREAM(rclcpp::get_logger("Timing"), "Time '" << tp.name.c_str() << "': " << t << " ms");
         return t;
       }
       return 0;
@@ -142,7 +142,7 @@ namespace timing {
         double t = elapsed_seconds.count() * 1000.0;
 
         if (print && !Timing::dont_print_times_)
-          ROS_INFO_STREAM("Time " << tp.name.c_str() << ": " << t << " ms");
+          RCLCPP_INFO_STREAM(rclcpp::get_logger("Timing"), "Time " << tp.name.c_str() << ": " << t << " ms");
 
         if (id >= 0)
         {
@@ -209,10 +209,10 @@ namespace timing {
       {
         const TimingInfo &at = iter->second;
         double avgTime = at.total_time / at.counter;
-        ROS_INFO_STREAM("Average time '" << at.name.c_str() << "': " << avgTime << " ms [" << at.counter << "]");
+        RCLCPP_INFO_STREAM(rclcpp::get_logger("Timing"), "Average time '" << at.name.c_str() << "': " << avgTime << " ms [" << at.counter << "]");
       }
       if (Timing::start_counter_ != Timing::stop_counter_)
-        ROS_INFO_STREAM("Problem: " << Timing::start_counter_ << " calls of startTiming and " << Timing::stop_counter_ << " calls of stopTiming.");
+        RCLCPP_INFO_STREAM(rclcpp::get_logger("Timing"), "Problem: " << Timing::start_counter_ << " calls of startTiming and " << Timing::stop_counter_ << " calls of stopTiming.");
     }
 
     static void printTimeSums()
@@ -222,10 +222,10 @@ namespace timing {
       {
         const TimingInfo &at = iter->second;
         const double timeSum = at.total_time;
-        ROS_INFO_STREAM("Time sum " << at.name.c_str() << ": " << timeSum << " ms");
+        RCLCPP_INFO_STREAM(rclcpp::get_logger("Timing"), "Time sum " << at.name.c_str() << ": " << timeSum << " ms");
       }
       if (Timing::start_counter_ != Timing::stop_counter_)
-        ROS_INFO_STREAM("Problem: " << Timing::start_counter_ << " calls of startTiming and " << Timing::stop_counter_ << " calls of stopTiming. ");
+        RCLCPP_INFO_STREAM(rclcpp::get_logger("Timing"), "Problem: " << Timing::start_counter_ << " calls of startTiming and " << Timing::stop_counter_ << " calls of stopTiming. ");
     }
   };
 }
