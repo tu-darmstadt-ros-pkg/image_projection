@@ -60,7 +60,11 @@ bool PeriodicImageProjection::init()
   initProjectionMat();
 
   std::stringstream topic_stream;
-  topic_stream << node_->get_namespace() << "/" << node_->get_name() << "/project_pixel_to_ray";
+  topic_stream << node_->get_namespace();
+  if (node_->get_namespace() != std::string("/")) {
+    topic_stream << "/";
+  }
+  topic_stream << node_->get_name() << "/project_pixel_to_ray";
   pixel_to_ray_srv_ = 
   node_->create_service<image_projection_msgs::srv::ProjectPixelTo3DRay>(topic_stream.str(), std::bind(&PeriodicImageProjection::projectPixelToRayCb, this, std::placeholders::_1, std::placeholders::_2));
 
