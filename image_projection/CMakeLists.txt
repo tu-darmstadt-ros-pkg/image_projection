@@ -130,14 +130,16 @@ add_executable(image_projection_server_standalone_node src/image_projection_serv
 target_link_libraries(image_projection_server_standalone_node ${PROJECT_NAME})
 
 # Install
-ament_export_targets(export_image_projection)
+ament_export_targets(export_image_projection HAS_LIBRARY_TARGET)
 install(TARGETS ${PROJECT_NAME}
   periodic_image_projection
   image_projection_server
   periodic_image_projection_standalone_node
   image_projection_server_standalone_node
-  EXPORT export_${PROJECT_NAME} LIBRARY DESTINATION lib/${PROJECT_NAME} ARCHIVE DESTINATION lib/${PROJECT_NAME} RUNTIME DESTINATION lib/${PROJECT_NAME})
+  EXPORT export_${PROJECT_NAME} LIBRARY DESTINATION lib ARCHIVE DESTINATION lib RUNTIME DESTINATION lib)
+
 install(DIRECTORY include/ DESTINATION include)
+
 
 install(DIRECTORY 
   config

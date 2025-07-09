@@ -26,6 +26,10 @@ bool PeriodicImageProjection::init()
   node_->declare_parameter("encoding", "");
   node_->get_parameter("encoding", encoding_);
 
+  node_->declare_parameter("sensor_frame", "");
+  std::string sensor_frame = node_->get_parameter("sensor_frame").get_value<std::string>();
+
+
   /*
   node_->declare_parameter("pose", std::vector<double>(6, 0));
   std::vector<double> pose_vec = node_->get_parameter("pose").as_double_array();
@@ -65,10 +69,7 @@ bool PeriodicImageProjection::init()
     topic_stream << "/";
   }
   topic_stream << node_->get_name() << "/project_pixel_to_ray";
-  pixel_to_ray_srv_ = 
-  node_->create_service<image_projection_msgs::srv::ProjectPixelTo3DRay>(topic_stream.str(), std::bind(&PeriodicImageProjection::projectPixelToRayCb, this, std::placeholders::_1, std::placeholders::_2));
-
-  
+  pixel_to_ray_srv_ = node_->create_service<image_projection_msgs::srv::ProjectPixelTo3DRay>(std::string(node_->get_namespace()) + "/" + sensor_frame + "/project_pixel_to_ray", std::bind(&PeriodicImageProjection::projectPixelToRayCb, this, std::placeholders::_1, std::placeholders::_2));
 
   pose_sub_ = node_->create_subscription<geometry_msgs::msg::Pose>("set_pose", 10, std::bind(&PeriodicImageProjection::poseCallback, this, std::placeholders::_1));
 
