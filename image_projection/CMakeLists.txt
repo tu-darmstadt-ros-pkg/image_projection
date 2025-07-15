@@ -136,10 +136,13 @@ install(TARGETS ${PROJECT_NAME}
   image_projection_server
   periodic_image_projection_standalone_node
   image_projection_server_standalone_node
-  EXPORT export_${PROJECT_NAME} LIBRARY DESTINATION lib/${PROJECT_NAME} ARCHIVE DESTINATION lib/${PROJECT_NAME} RUNTIME DESTINATION lib/${PROJECT_NAME})
+  EXPORT export_${PROJECT_NAME}
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+  RUNTIME DESTINATION lib/${PROJECT_NAME})
 install(DIRECTORY include/ DESTINATION include)
 
-install(DIRECTORY 
+install(DIRECTORY
   config
   DESTINATION share/${PROJECT_NAME}
 )
