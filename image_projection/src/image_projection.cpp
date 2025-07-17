@@ -143,11 +143,11 @@ std::map<std::string, cv_bridge::CvImageConstPtr> ImageProjection::getLatestImag
   // Retrieve images from all cams
   // TODO: lock image retrieval
   std::map<std::string, std::shared_ptr<sensor_msgs::msg::Image const>> images;
-  std::vector<uint64_t> stamps;
+  std::vector<int64_t> stamps;
   for (const extended_image_geometry::CameraPtr& cam: camera_loader_.cameras()) {
     const std::shared_ptr<sensor_msgs::msg::Image const> image = cam->getLastImage();
     if (image) {
-      stamps.push_back(image->header.stamp.nanosec);
+      stamps.push_back(rclcpp::Time(image->header.stamp).nanoseconds());
       images[cam->getName()] = image;
     }
   }
@@ -179,7 +179,7 @@ std::map<std::string, cv_bridge::CvImageConstPtr> ImageProjection::getLatestImag
   }
 
   // Compute average stamp
-  std::transform(begin(stamps), end(stamps), begin(stamps), [stamps](uint64_t& x){return x/stamps.size();});
+  std::transform(begin(stamps), end(stamps), begin(stamps), [stamps](int64_t& x){return x/stamps.size();});
   //stamp.fromNSec(std::accumulate(begin(stamps), end(stamps), 0ul));
   stamp = rclcpp::Time(std::accumulate(begin(stamps), end(stamps), 0ul));
   return cv_images;
