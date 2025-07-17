@@ -25,19 +25,24 @@ typedef std::unordered_map<std::string, std::pair<cv::UMat, cv::UMat>> PixelMapp
 typedef std::shared_ptr<image_projection_plugin_interface::ProjectionBase> ProjectionPtr;
 typedef pluginlib::ClassLoader<image_projection_plugin_interface::ProjectionBase> ProjectionClassLoader;
 
-class ImageProjection {
+class ImageProjection
+{
 public:
-  ImageProjection(const rclcpp::Node::SharedPtr node);
+  using CvImageMap = std::unordered_map<std::string, cv_bridge::CvImageConstPtr>;
+  explicit ImageProjection(const rclcpp::Node::SharedPtr& node);
   ~ImageProjection();
 
   ProjectionPtr loadProjectionPlugin(const std::string& projection_name);
-  PixelMapping createMapping(const ProjectionPtr& projection, const std::string& base_frame, const rclcpp::Time& stamp=rclcpp::Clock().now(),
-                             const Eigen::Isometry3d& sensor_pose=Eigen::Isometry3d::Identity()) const;
-  std::map<std::string, cv_bridge::CvImageConstPtr> getLatestImages(rclcpp::Time& stamp, std::string& encoding) const;
-  bool projectImages(const std::map<std::string, cv_bridge::CvImageConstPtr>& images, const PixelMapping& pixel_mapping, cv::UMat& projection) const;
-  bool projectLatestImages(const PixelMapping& pixel_mapping, cv::UMat& projection, rclcpp::Time& stamp, std::string& encoding) const;
+  [[nodiscard]] PixelMapping createMapping(const ProjectionPtr& projection, const std::string& base_frame,
+                                           const rclcpp::Time& stamp = rclcpp::Clock().now(),
+                                           const Eigen::Isometry3d& sensor_pose = Eigen::Isometry3d::Identity()) const;
+  CvImageMap getLatestImages(rclcpp::Time& stamp, std::string& encoding) const;
+  bool projectImages(const CvImageMap& images, const PixelMapping& pixel_mapping, cv::UMat& projection) const;
+  bool projectLatestImages(const PixelMapping& pixel_mapping, cv::UMat& projection, rclcpp::Time& stamp,
+                           std::string& encoding) const;
 
   extended_image_geometry::CameraLoader& getCameraLoader();
+
 private:
   rclcpp::Node::SharedPtr node_;
 
@@ -52,6 +57,6 @@ private:
   std::string save_folder_;
 };
 
-}
+}  // namespace image_projection
 
 #endif

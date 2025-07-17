@@ -3,32 +3,34 @@
 
 #include <rclcpp/rclcpp.hpp>
 #include <image_transport/image_transport.hpp>
-//#include <dynamic_reconfigure/server.h>
+// #include <dynamic_reconfigure/server.h>
 #include <geometry_msgs/msg/pose.hpp>
 #include <tf2_ros/transform_broadcaster.h>
 #include <hector_ros2_utils/parameters/reconfigurable_parameter.hpp>
 
 #include <image_projection_msgs/srv/project_pixel_to3_d_ray.hpp>
 
-//#include <image_projection/ProjectionConfig.h>
+// #include <image_projection/ProjectionConfig.h>
 #include <image_projection/image_projection.h>
 
 namespace image_projection {
 
-class PeriodicImageProjection {
+class PeriodicImageProjection
+{
 public:
   PeriodicImageProjection(const rclcpp::Node::SharedPtr node);
   bool init();
   void initProjectionMat();
   void projectAndPublishLatestImages();
+
 private:
   void connectCb();
   void poseParamCallback(std::vector<double> pose_vec);
   void poseCallback(const std::shared_ptr<geometry_msgs::msg::Pose const> pose);
   void updateSensorPose(const Eigen::Isometry3d& sensor_pose);
   void updateSensorPose(double x, double y, double z, double roll, double pitch, double yaw);
-  void updateReconfigureConfig(const std::vector<double>& pose_vec);
-  bool projectPixelToRayCb(const image_projection_msgs::srv::ProjectPixelTo3DRay::Request::SharedPtr req, image_projection_msgs::srv::ProjectPixelTo3DRay::Response::SharedPtr resp);
+  bool projectPixelToRayCb(const image_projection_msgs::srv::ProjectPixelTo3DRay::Request::SharedPtr req,
+                           image_projection_msgs::srv::ProjectPixelTo3DRay::Response::SharedPtr resp);
   void publishTfTimerCallback();
   void publishCameraFrameToTf();
 
@@ -52,6 +54,7 @@ private:
   ProjectionPtr projection_;
   PixelMapping pixel_mapping_;
   cv::UMat projected_image_;
+  rclcpp::Time last_image_stamp_;
 
   // Image publisher
   image_transport::ImageTransport it_;
@@ -76,6 +79,6 @@ private:
   rclcpp::TimerBase::SharedPtr connection_check_timer_;
 };
 
-}
+}  // namespace image_projection
 
 #endif
