@@ -119,10 +119,12 @@ void PeriodicImageProjection::connectCb()
 {
   std::lock_guard<std::mutex> lock(connect_mutex_);
   if (image_pub_.getNumSubscribers() == 0) {
+    RCLCPP_INFO_EXPRESSION(node_->get_logger(), enabled_, "No subscribers. Stopping image projection.");
     enabled_ = false;
     image_projection_lib_.getCameraLoader().stopImageSubscribers();
   } else {
     if (!enabled_) {
+      RCLCPP_INFO(node_->get_logger(), "Have subscriber. Starting image projection.");
       image_projection_lib_.getCameraLoader().startImageSubscribers();
       enabled_ = true;
     }
@@ -155,7 +157,7 @@ void PeriodicImageProjection::projectAndPublishLatestImages()
   }
 
   // Do not compute the mapping yet, if we are disabled and we compute the mapping each time anyway
-  if (!enabled_ && always_recompute_mapping_) {
+  if (!enabled_ && !always_recompute_mapping_) {
     return;
   }
 
@@ -169,6 +171,8 @@ void PeriodicImageProjection::projectAndPublishLatestImages()
   auto images = image_projection_lib_.getLatestImages(stamp, encoding_);
   if (stamp == last_image_stamp_) {
     // No new images received
+    RCLCPP_INFO_THROTTLE(node_->get_logger(), *(node_->get_clock()), 3000,
+                         "No new images received. Skipping projection. This message is throttled.");
     return;
   }
 
@@ -183,7 +187,8 @@ void PeriodicImageProjection::projectAndPublishLatestImages()
       }
       projection_->unsetMappingChanged();
     } else {
-      RCLCPP_WARN_STREAM_THROTTLE(node_->get_logger(), *(node_->get_clock()), 3, "No camera info received yet. This message is throttled.");
+      RCLCPP_WARN_STREAM_THROTTLE(node_->get_logger(), *(node_->get_clock()), 3,
+                                  "No camera info received yet. This message is throttled.");
       return;
     }
   }
