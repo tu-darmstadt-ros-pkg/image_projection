@@ -119,6 +119,8 @@ void PeriodicImageProjection::connectCb()
   std::lock_guard<std::mutex> lock(connect_mutex_);
   if (image_pub_.getNumSubscribers() == 0) {
     RCLCPP_INFO_EXPRESSION(node_->get_logger(), enabled_, "No subscribers. Stopping image projection.");
+    RCLCPP_INFO_THROTTLE(node_->get_logger(), (*node_->get_clock()), 3000,
+                         "No subscribers. Image projection is paused. This message is throttled.");
     enabled_ = false;
     image_projection_lib_.getCameraLoader().stopImageSubscribers();
   } else {
@@ -152,6 +154,9 @@ void PeriodicImageProjection::projectAndPublishLatestImages()
   std::scoped_lock<std::recursive_mutex> mutex_lock(reconfigure_mutex_);
   // Check if projection has been initialized
   if (!projection_) {
+    RCLCPP_ERROR_THROTTLE(
+        node_->get_logger(), *(node_->get_clock()), 3000,
+        "Projection has not been initialized using init method. Skipping projection. This message is throttled.");
     return;
   }
 
