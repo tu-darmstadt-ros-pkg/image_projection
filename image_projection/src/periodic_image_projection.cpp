@@ -119,14 +119,15 @@ void PeriodicImageProjection::connectCb()
   std::lock_guard<std::mutex> lock(connect_mutex_);
   if (image_pub_.getNumSubscribers() == 0) {
     RCLCPP_INFO_EXPRESSION(node_->get_logger(), enabled_, "No subscribers. Stopping image projection.");
-    RCLCPP_INFO_THROTTLE(node_->get_logger(), (*node_->get_clock()), 3000,
-                         "No subscribers. Image projection is paused. This message is throttled.");
+    RCLCPP_INFO_THROTTLE(node_->get_logger(), (*node_->get_clock()), 10000,
+                         "No subscribers. Image projection is paused. This message is throttled to 10s.");
     enabled_ = false;
     image_projection_lib_.getCameraLoader().stopImageSubscribers();
   } else {
     if (!enabled_) {
       RCLCPP_INFO(node_->get_logger(), "Have subscriber. Starting image projection.");
       image_projection_lib_.getCameraLoader().startImageSubscribers();
+      RCLCPP_INFO(node_->get_logger(), "Started subscription.");
       enabled_ = true;
     }
   }
@@ -164,9 +165,11 @@ void PeriodicImageProjection::projectAndPublishLatestImages()
   if (!enabled_ && !always_recompute_mapping_) {
     return;
   }
+  RCLCPP_INFO_ONCE(node_->get_logger(), "Projecting images.");
 
   // Check if projection parameters have changed
   if (projection_->mappingChanged()) {
+    RCLCPP_INFO_ONCE(node_->get_logger(), "Updating mapping.");
     initProjectionMat();
   }
 
@@ -179,8 +182,10 @@ void PeriodicImageProjection::projectAndPublishLatestImages()
                          "No new images received. Skipping projection. This message is throttled.");
     return;
   }
+  RCLCPP_INFO_ONCE(node_->get_logger(), "Got images.");
 
   if (pixel_mapping_.empty() || always_recompute_mapping_) {
+    RCLCPP_INFO_ONCE(node_->get_logger(), "Compute mapping.");
     // If no mapping is saved and camera info is available, compute it
     if (image_projection_lib_.getCameraLoader().cameraInfosReceived()) {
       pixel_mapping_ =
@@ -201,9 +206,11 @@ void PeriodicImageProjection::projectAndPublishLatestImages()
     return;
   }
 
+    RCLCPP_INFO_ONCE(node_->get_logger(), "Project images.");
   if (!image_projection_lib_.projectImages(images, pixel_mapping_, projected_image_)) {
     return;
   }
+  RCLCPP_INFO_ONCE(node_->get_logger(), "Publish");
 
   // Convert to sensor msg
   std_msgs::msg::Header header;
