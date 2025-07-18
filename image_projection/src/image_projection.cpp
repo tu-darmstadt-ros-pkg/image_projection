@@ -156,8 +156,12 @@ ImageProjection::CvImageMap ImageProjection::getLatestImages(rclcpp::Time& stamp
   std::unordered_map<std::string, std::shared_ptr<sensor_msgs::msg::Image const>> images;
   std::vector<int64_t> stamps;
   for (const extended_image_geometry::CameraPtr& cam : camera_loader_.cameras()) {
-    if (!cam->cameraInfoReceived())
+    if (!cam->cameraInfoReceived()) {
+      RCLCPP_WARN_THROTTLE(
+          node_->get_logger(), *(node_->get_clock()), 3000,
+          "Camera info not received yet for camera. Skipping image retrieval. This message is throttled.");
       continue;
+    }
     const std::shared_ptr<sensor_msgs::msg::Image const> image = cam->getLastImage();
     if (image) {
       stamps.push_back(rclcpp::Time(image->header.stamp).nanoseconds());

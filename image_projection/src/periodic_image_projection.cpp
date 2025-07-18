@@ -165,17 +165,14 @@ void PeriodicImageProjection::projectAndPublishLatestImages()
   if (!enabled_ && !always_recompute_mapping_) {
     return;
   }
-  RCLCPP_INFO(node_->get_logger(), "Projecting images.");
 
   // Check if projection parameters have changed
   if (projection_->mappingChanged()) {
-    RCLCPP_INFO(node_->get_logger(), "Updating mapping.");
     initProjectionMat();
   }
 
   // Get images first
   rclcpp::Time stamp;
-  RCLCPP_INFO(node_->get_logger(), "Get latest images.");
   auto images = image_projection_lib_.getLatestImages(stamp, encoding_);
   if (stamp == last_image_stamp_) {
     // No new images received
@@ -184,10 +181,8 @@ void PeriodicImageProjection::projectAndPublishLatestImages()
     return;
   }
   last_image_stamp_ = stamp;
-  RCLCPP_INFO(node_->get_logger(), "Got images.");
 
   if (pixel_mapping_.empty() || always_recompute_mapping_) {
-    RCLCPP_INFO(node_->get_logger(), "Compute mapping.");
     // If no mapping is saved and camera info is available, compute it
     if (image_projection_lib_.getCameraLoader().cameraInfosReceived()) {
       pixel_mapping_ =
@@ -208,11 +203,9 @@ void PeriodicImageProjection::projectAndPublishLatestImages()
     return;
   }
 
-    RCLCPP_INFO_ONCE(node_->get_logger(), "Project images.");
   if (!image_projection_lib_.projectImages(images, pixel_mapping_, projected_image_)) {
     return;
   }
-  RCLCPP_INFO_ONCE(node_->get_logger(), "Publish");
 
   // Convert to sensor msg
   std_msgs::msg::Header header;
