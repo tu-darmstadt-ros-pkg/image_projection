@@ -22,7 +22,6 @@ PeriodicImageProjection::PeriodicImageProjection(const rclcpp::Node::SharedPtr n
 
 bool PeriodicImageProjection::init()
 {
-
   // Load parameters
   std::string projection_type;
   loadMandatoryParameter(node_, "projection_type", projection_type);

@@ -2,7 +2,9 @@
 
 namespace image_projection {
 
-PeriodicImageProjectionNode::PeriodicImageProjectionNode(const rclcpp::NodeOptions& options) : node_(std::make_shared<rclcpp::Node>("periodic_image_projection_node", options)) {
+PeriodicImageProjectionNode::PeriodicImageProjectionNode(const rclcpp::NodeOptions& options)
+    : node_(std::make_shared<rclcpp::Node>("periodic_image_projection_node", options))
+{
   // Create PeriodicImageProjection with shared node handle
   periodic_image_projection_ = std::make_shared<PeriodicImageProjection>(node_);
 
@@ -17,9 +19,9 @@ PeriodicImageProjectionNode::PeriodicImageProjectionNode(const rclcpp::NodeOptio
   using namespace std::chrono_literals;
   auto period = std::chrono::duration<double>(1.0 / update_rate);
 
-  timer_ = node_->create_wall_timer(
-    std::chrono::duration_cast<std::chrono::milliseconds>(period),
-    std::bind(&PeriodicImageProjectionNode::timerCb, this));
+  timer_ = node_->create_wall_timer(std::chrono::duration_cast<std::chrono::milliseconds>(period),
+                                    std::bind(&PeriodicImageProjectionNode::timerCb, this));
+  RCLCPP_INFO(node_->get_logger(), "PeriodicImageProjectionNode initialized with update rate: %.2f Hz", update_rate);
 }
 
 rclcpp::node_interfaces::NodeBaseInterface::SharedPtr PeriodicImageProjectionNode::get_node_base_interface() const
@@ -27,7 +29,8 @@ rclcpp::node_interfaces::NodeBaseInterface::SharedPtr PeriodicImageProjectionNod
   return this->node_->get_node_base_interface();
 }
 
-void PeriodicImageProjectionNode::timerCb() {
+void PeriodicImageProjectionNode::timerCb()
+{
   periodic_image_projection_->projectAndPublishLatestImages();
 }
 
