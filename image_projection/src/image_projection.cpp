@@ -156,6 +156,8 @@ ImageProjection::CvImageMap ImageProjection::getLatestImages(rclcpp::Time& stamp
   std::unordered_map<std::string, std::shared_ptr<sensor_msgs::msg::Image const>> images;
   std::vector<int64_t> stamps;
   for (const extended_image_geometry::CameraPtr& cam : camera_loader_.cameras()) {
+    if (!cam->cameraInfoReceived())
+      continue;
     const std::shared_ptr<sensor_msgs::msg::Image const> image = cam->getLastImage();
     if (image) {
       stamps.push_back(rclcpp::Time(image->header.stamp).nanoseconds());
@@ -163,7 +165,7 @@ ImageProjection::CvImageMap ImageProjection::getLatestImages(rclcpp::Time& stamp
     }
   }
 
-  std::unordered_map<std::string, cv_bridge::CvImageConstPtr> cv_images;
+  CvImageMap cv_images;
   // Return empty map if no image has been received
   if (images.empty()) {
     return cv_images;
