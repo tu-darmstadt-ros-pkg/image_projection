@@ -175,6 +175,7 @@ void PeriodicImageProjection::projectAndPublishLatestImages()
 
   // Get images first
   rclcpp::Time stamp;
+  RCLCPP_INFO_ONCE(node_->get_logger(), "Get latest images.");
   auto images = image_projection_lib_.getLatestImages(stamp, encoding_);
   if (stamp == last_image_stamp_) {
     // No new images received
