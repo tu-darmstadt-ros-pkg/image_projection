@@ -54,7 +54,7 @@ private:
   ProjectionPtr projection_;
   PixelMapping pixel_mapping_;
   cv::UMat projected_image_;
-  rclcpp::Time last_image_stamp_;
+  rclcpp::Time last_image_stamp_{};
 
   // Image publisher
   image_transport::ImageTransport it_;
