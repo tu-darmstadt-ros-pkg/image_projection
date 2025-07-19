@@ -66,14 +66,8 @@ bool PeriodicImageProjection::init()
   projection_->loadParameters();
   initProjectionMat();
 
-  std::stringstream topic_stream;
-  topic_stream << node_->get_namespace();
-  if (node_->get_namespace() != std::string("/")) {
-    topic_stream << "/";
-  }
-  topic_stream << node_->get_name() << "/project_pixel_to_ray";
   pixel_to_ray_srv_ = node_->create_service<image_projection_msgs::srv::ProjectPixelTo3DRay>(
-      topic_stream.str(),
+      std::string(node_->get_namespace()) + "/" + node_->get_parameter("virtual_sensor_optical_frame").get_value<std::string>() + "/project_pixel_to_ray",
       std::bind(&PeriodicImageProjection::projectPixelToRayCb, this, std::placeholders::_1, std::placeholders::_2));
 
   pose_sub_ = node_->create_subscription<geometry_msgs::msg::Pose>(
