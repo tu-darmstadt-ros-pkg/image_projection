@@ -61,8 +61,7 @@ bool PeriodicImageProjection::init()
     return false;
   }
 
-  std::string ns = "projection_parameters";
-  projection_->initialize(node_, ns);
+  projection_->initialize(node_);
   projection_->loadParameters();
   initProjectionMat();
 
@@ -81,11 +80,20 @@ bool PeriodicImageProjection::init()
 
   // Publish virtual sensor frame tf
   node_->declare_parameter("publish_tf", true);
-  node_->declare_parameter("virtual_sensor_frame", std::string(""));
-  node_->declare_parameter("virtual_sensor_optical_frame", std::string(""));
   node_->get_parameter("publish_tf", publish_tf_);
-  node_->get_parameter("virtual_sensor_frame", virtual_sensor_frame_);
-  node_->get_parameter("virtual_sensor_optical_frame", virtual_sensor_optical_frame_);
+
+  virtual_frame_sub_ = hector::createReconfigurableParameter(
+      node_, "virtual_sensor_frame", std::ref(virtual_sensor_frame_), "Name of the virtual sensor frame",
+      hector::ParameterOptions<std::string>().onUpdate(
+          std::bind(&PeriodicImageProjection::virtualSensorFrameParamCallback, this, std::placeholders::_1)));
+  projection_->updateVirtualSensorFrame(virtual_sensor_frame_);
+
+  virtual_optical_frame_sub_ = hector::createReconfigurableParameter(
+      node_, "virtual_sensor_optical_frame", std::ref(virtual_sensor_optical_frame_),
+      "Name of the virtual sensor optical frame",
+      hector::ParameterOptions<std::string>().onUpdate(
+          std::bind(&PeriodicImageProjection::virtualSensorOpticalFrameParamCallback, this, std::placeholders::_1)));
+  projection_->updateVirtualSensorOpticalFrame(virtual_sensor_optical_frame_);
 
   if (!virtual_sensor_optical_frame_.empty()) {
     optical_transform_msg_ = tf2::eigenToTransform(optical_frame_transform_);
@@ -275,6 +283,28 @@ void PeriodicImageProjection::updateSensorPose(double x, double y, double z, dou
                                 Eigen::AngleAxisd(roll, Eigen::Vector3d::UnitX()));
   sensor_pose.translation() = Eigen::Vector3d(x, y, z);
   updateSensorPose(sensor_pose);
+}
+
+void PeriodicImageProjection::virtualSensorFrameParamCallback(const std::string& frame_id)
+{
+  std::scoped_lock<std::recursive_mutex> mutex_lock(reconfigure_mutex_);
+  virtual_sensor_frame_ = frame_id;
+  if (publish_tf_) {
+    optical_transform_msg_.header.frame_id = virtual_sensor_frame_;
+    publishCameraFrameToTf();
+  }
+  projection_->updateVirtualSensorFrame(virtual_sensor_frame_);
+}
+
+void PeriodicImageProjection::virtualSensorOpticalFrameParamCallback(const std::string& optical_frame_id)
+{
+  std::scoped_lock<std::recursive_mutex> mutex_lock(reconfigure_mutex_);
+  virtual_sensor_optical_frame_ = optical_frame_id;
+  if (publish_tf_) {
+    optical_transform_msg_.child_frame_id = virtual_sensor_optical_frame_;
+    publishCameraFrameToTf();
+  }
+  projection_->updateVirtualSensorOpticalFrame(virtual_sensor_optical_frame_);
 }
 
 }  // namespace image_projection

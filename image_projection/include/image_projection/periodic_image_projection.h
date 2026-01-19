@@ -34,6 +34,9 @@ private:
   void publishTfTimerCallback();
   void publishCameraFrameToTf();
 
+  void virtualSensorFrameParamCallback(const std::string& frame_id);
+  void virtualSensorOpticalFrameParamCallback(const std::string& optical_frame_id);
+
   // Node
   rclcpp::Node::SharedPtr node_;
   bool enabled_;
@@ -63,6 +66,8 @@ private:
 
   // Parameter Subscription for pose
   hector::ParameterSubscription pose_param_sub_;
+  hector::ParameterSubscription virtual_frame_sub_;
+  hector::ParameterSubscription virtual_optical_frame_sub_;
   std::vector<double> pose_vec_;
 
   // Parameters

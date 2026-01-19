@@ -40,16 +40,17 @@ IdealFisheyeProjection::targetImagePixelToProjectionSurfacePoint(const Eigen::Ve
 bool IdealFisheyeProjection::loadProjectionParameters()
 {
   addReconfigurableParameter(
-      "sphere_radius", sphere_radius_, "Radius of the (virtual) fisheye sphere (in m)",
+      "projection_parameters.sphere_radius", sphere_radius_, "Radius of the (virtual) fisheye sphere (in m)",
       hector::ParameterOptions<double>().onValidate([](const auto& value) { return value > 0; }));
   addReconfigurableParameter(
-      "fov", fov_rad_, "Fisheye horizontal and vertical field of view (in deg)",
+      "projection_parameters.fov", fov_rad_, "Fisheye horizontal and vertical field of view (in deg)",
       hector::ParameterOptions<double>().onValidate([](const auto& value) { return value > 0; }));
   return true;
 }
 
 void IdealFisheyeProjection::onParametersChanged()
 {
+  ProjectionBase::onParametersChanged();
   image_width_2_ = static_cast<double>(imageWidth()) / 2.0;
   image_height_2_ = static_cast<double>(imageHeight()) / 2.0;
   fov_rad_2_ = fov_rad_ / 2.0;
@@ -60,6 +61,7 @@ void IdealFisheyeProjection::onParametersChanged()
   } else {
     angle_step_ = fov_rad_ / imageHeight();
   }
+  mappingChanged();
 }
 
 }  // namespace image_projection_plugins

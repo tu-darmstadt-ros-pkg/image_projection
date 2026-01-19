@@ -2,16 +2,10 @@
 
 namespace image_projection_plugins {
 
-bool PinholeProjection::initialize(const rclcpp::Node::SharedPtr& node, const std::string& name)
+bool PinholeProjection::initialize(const rclcpp::Node::SharedPtr& node)
 {
-  ProjectionBase::initialize(node, name);
+  ProjectionBase::initialize(node);
 
-  addReconfigurableParameter("virtual_sensor_optical_frame", virtual_sensor_optical_frame_,
-                             "Name of the optical frame to be published for the virtual camera.");
-  if (!virtual_sensor_optical_frame_.empty()) {
-    auto qos = rclcpp::QoS(10).transient_local();
-    camera_info_pub_ = node_->create_publisher<sensor_msgs::msg::CameraInfo>("camera_info", qos);  // TODO transient local
-  }
   return true;
 }
 
@@ -40,28 +34,39 @@ PinholeProjection::targetImagePixelToProjectionSurfacePoint(const Eigen::Vector2
 bool PinholeProjection::loadProjectionParameters()
 {
   addReconfigurableParameter(
-      "focal_length", focal_length_, "Focal length of the virtual camera (in m)",
+      "projection_parameters.focal_length", focal_length_, "Focal length of the virtual camera (in m)",
       hector::ParameterOptions<double>().onValidate([](const auto& value) { return value > 0; }));
-  addReconfigurableParameter("horizontal_fov", horizontal_fov, "Horizontal field of view (in degree)",
-                             hector::ParameterOptions<double>().onValidate(
-                                 [](const auto& value) { return value > 0 && value < 180; }));
+  addReconfigurableParameter(
+      "projection_parameters.horizontal_fov", horizontal_fov, "Horizontal field of view (in degree)",
+      hector::ParameterOptions<double>().onValidate([](const auto& value) { return value > 0 && value < 180; }));
 
   return true;
 }
 
 void PinholeProjection::onParametersChanged()
 {
+  ProjectionBase::onParametersChanged();
   const double horizontal_fov_rad = horizontal_fov * M_PI / 180;
   const double sensor_size_x = 2 * focal_length_ * std::tan(horizontal_fov_rad / 2.0);
   m_per_pixel_ = sensor_size_x / imageWidth();
   image_width_2_ = static_cast<double>(imageWidth()) / 2.0;
   image_height_2_ = static_cast<double>(imageHeight()) / 2.0;
+  updateCameraInfoPublisher();
   publishCameraInfo();
+}
+
+void PinholeProjection::updateCameraInfoPublisher()
+{
+  if (!virtualSensorOpticalFrame().empty() && !camera_info_pub_) {
+    auto qos = rclcpp::QoS(10).transient_local();
+    camera_info_pub_ =
+        node_->create_publisher<sensor_msgs::msg::CameraInfo>("camera_info", qos);  // TODO transient local
+  }
 }
 
 void PinholeProjection::publishCameraInfo() const
 {
-  if (virtual_sensor_optical_frame_.empty()) {
+  if (virtualSensorOpticalFrame().empty()) {
     return;
   }
   const sensor_msgs::msg::CameraInfo info = parametersToCameraInfo();
@@ -72,7 +77,7 @@ sensor_msgs::msg::CameraInfo PinholeProjection::parametersToCameraInfo() const
 {
   sensor_msgs::msg::CameraInfo info_msg;
   info_msg.header.stamp = node_->get_clock()->now();
-  info_msg.header.frame_id = virtual_sensor_optical_frame_;
+  info_msg.header.frame_id = virtualSensorOpticalFrame();
 
   info_msg.width = static_cast<unsigned int>(imageWidth());
   info_msg.height = static_cast<unsigned int>(imageHeight());
