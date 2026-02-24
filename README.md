@@ -18,9 +18,12 @@ Projections can be created periodically or on-demand. All projection parameters 
 
 A demo launch configuration is available below.
 
-**Author/Maintainer: Martin Oehler<br/>
+**Author: Martin Oehler<br/>
 Affiliation:  [TU Darmstadt, SIM](https://www.sim.informatik.tu-darmstadt.de/index/)<br/>
-License: MIT**
+License: MIT<br/>
+
+Maintainer: Frederik Bark
+**
 
 ## Examples
 
@@ -44,8 +47,8 @@ Please cite our paper if you use this software as part of your scientific public
 ```
 @INPROCEEDINGS{oehler2021flexible,
   author={Oehler, Martin and von Stryk, Oskar},
-  booktitle={2021 European Conference on Mobile Robots (ECMR)}, 
-  title={A Flexible Framework for Virtual Omnidirectional Vision to Improve Operator Situation Awareness}, 
+  booktitle={2021 European Conference on Mobile Robots (ECMR)},
+  title={A Flexible Framework for Virtual Omnidirectional Vision to Improve Operator Situation Awareness},
   year={2021}
 }
 ```
@@ -53,7 +56,7 @@ Please cite our paper if you use this software as part of your scientific public
 ## Installation
 If you haven't already installed it, [install ROS](http://wiki.ros.org/noetic/Installation/Ubuntu). Please use **Desktop-Full Install** to run the demo. Noetic is officially supported, but Melodic and Kinetic should work as well.
 
-[Create a new catkin workspace](https://catkin-tools.readthedocs.io/en/latest/quick_start.html). Skip this step if you use your existing workspace. 
+[Create a new catkin workspace](https://catkin-tools.readthedocs.io/en/latest/quick_start.html). Skip this step if you use your existing workspace.
 ```
 source /opt/ros/noetic/setup.bash
 mkdir -p catkin_ws/src
@@ -146,6 +149,10 @@ This node/nodelet periodically publishes a projected image from the latest camer
 * **`~set_pose`** ([geometry_msgs/Pose])
 
   Set the pose of the virtual sensor frame relative to `~base_frame`. Can be used to implement a virtual pan-tilt sensor head by updating the sensor pose based on joystick feedback.
+* **`~set_transform`** ([geometry_msgs/Transform])
+
+  Transforms the pose of the virtual sensor. This allows set_pose to set a base_pose and move the virtual camera around it with set_transform.
+
 * **`/tf`** and **`/tf_static`** ([tf2_msgs/TFMessage])
 
      [tf2](http://wiki.ros.org/tf2) is used to retrieve the transformations between each camera's optical frame and the projection `base_frame`.

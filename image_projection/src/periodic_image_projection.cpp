@@ -78,6 +78,9 @@ bool PeriodicImageProjection::init()
   pose_sub_ = node_->create_subscription<geometry_msgs::msg::Pose>(
       "set_pose", 10, std::bind(&PeriodicImageProjection::poseCallback, this, std::placeholders::_1));
 
+  pose_transform_sub_ = node_->create_subscription<geometry_msgs::msg::Transform>(
+      "set_transform", 10, std::bind(&PeriodicImageProjection::poseTransformCallback, this, std::placeholders::_1));
+
   // Publish virtual sensor frame tf
   node_->declare_parameter("publish_tf", true);
   node_->get_parameter("publish_tf", publish_tf_);
@@ -154,6 +157,16 @@ void PeriodicImageProjection::poseCallback(const std::shared_ptr<geometry_msgs::
   std::scoped_lock<std::recursive_mutex> mutex_lock(reconfigure_mutex_);
   tf2::fromMsg(*pose, virtual_sensor_pose_);
   updateSensorPose(virtual_sensor_pose_);
+  initProjectionMat();
+  publishCameraFrameToTf();
+}
+
+void PeriodicImageProjection::poseTransformCallback(const std::shared_ptr<geometry_msgs::msg::Transform const> transform)
+{
+  std::scoped_lock<std::recursive_mutex> mutex_lock(reconfigure_mutex_);
+  virtual_sensor_transform_ = tf2::transformToEigen(*transform);
+  // tf2::fromMsg(*transform, virtual_sensor_transform_);
+  updateSensorTransform(virtual_sensor_transform_);
   initProjectionMat();
   publishCameraFrameToTf();
 }
@@ -272,8 +285,16 @@ void PeriodicImageProjection::publishCameraFrameToTf()
 
 void PeriodicImageProjection::updateSensorPose(const Eigen::Isometry3d& sensor_pose)
 {
-  virtual_sensor_pose_ = sensor_pose;
+  virtual_sensor_base_pose_ = sensor_pose;
+  virtual_sensor_pose_ = virtual_sensor_base_pose_ * virtual_sensor_transform_;
   virtual_sensor_optical_pose_ = sensor_pose * optical_frame_transform_;
+}
+
+void PeriodicImageProjection::updateSensorTransform(const Eigen::Isometry3d& sensor_transform)
+{
+  virtual_sensor_transform_ = sensor_transform;
+  virtual_sensor_pose_ = virtual_sensor_base_pose_ * virtual_sensor_transform_;
+  virtual_sensor_optical_pose_ = virtual_sensor_base_pose_ * virtual_sensor_transform_ * optical_frame_transform_;
 }
 
 void PeriodicImageProjection::updateSensorPose(double x, double y, double z, double roll, double pitch, double yaw)

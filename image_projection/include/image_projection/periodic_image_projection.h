@@ -5,6 +5,7 @@
 #include <image_transport/image_transport.hpp>
 // #include <dynamic_reconfigure/server.h>
 #include <geometry_msgs/msg/pose.hpp>
+#include <geometry_msgs/msg/transform.hpp>
 #include <tf2_ros/transform_broadcaster.h>
 #include <hector_ros2_utils/parameters/reconfigurable_parameter.hpp>
 
@@ -27,7 +28,9 @@ private:
   void connectCb();
   void poseParamCallback(std::vector<double> pose_vec);
   void poseCallback(const std::shared_ptr<geometry_msgs::msg::Pose const> pose);
+  void poseTransformCallback(const std::shared_ptr<geometry_msgs::msg::Transform const> transform);
   void updateSensorPose(const Eigen::Isometry3d& sensor_pose);
+  void updateSensorTransform(const Eigen::Isometry3d& sensor_transform);
   void updateSensorPose(double x, double y, double z, double roll, double pitch, double yaw);
   bool projectPixelToRayCb(const image_projection_msgs::srv::ProjectPixelTo3DRay::Request::SharedPtr req,
                            image_projection_msgs::srv::ProjectPixelTo3DRay::Response::SharedPtr resp);
@@ -43,6 +46,7 @@ private:
 
   std::recursive_mutex reconfigure_mutex_;
   rclcpp::Subscription<geometry_msgs::msg::Pose>::SharedPtr pose_sub_;
+  rclcpp::Subscription<geometry_msgs::msg::Transform>::SharedPtr pose_transform_sub_;
   rclcpp::Service<image_projection_msgs::srv::ProjectPixelTo3DRay>::SharedPtr pixel_to_ray_srv_;
 
   // TF
@@ -75,6 +79,8 @@ private:
   std::string virtual_sensor_frame_;
   std::string virtual_sensor_optical_frame_;
   Eigen::Isometry3d virtual_sensor_pose_;
+  Eigen::Isometry3d virtual_sensor_base_pose_;
+  Eigen::Isometry3d virtual_sensor_transform_;
   Eigen::Isometry3d virtual_sensor_optical_pose_;
   Eigen::Isometry3d optical_frame_transform_;
   std::string encoding_;
