@@ -107,6 +107,8 @@ bool PeriodicImageProjection::init()
     tf_timer_ = node_->create_wall_timer(50ms, std::bind(&PeriodicImageProjection::publishTfTimerCallback, this));
   }
 
+  virtual_sensor_transform_ = Eigen::Isometry3d::Identity();
+
   // Image publisher
   image_transport::SubscriberStatusCallback connect_cb = std::bind(&PeriodicImageProjection::connectCb, this);
   std::lock_guard<std::mutex> lock(connect_mutex_);
