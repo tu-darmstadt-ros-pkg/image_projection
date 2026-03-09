@@ -108,6 +108,7 @@ bool PeriodicImageProjection::init()
   }
 
   virtual_sensor_transform_ = Eigen::Isometry3d::Identity();
+  virtual_sensor_base_pose_ = Eigen::Isometry3d::Identity();
 
   // Image publisher
   image_transport::SubscriberStatusCallback connect_cb = std::bind(&PeriodicImageProjection::connectCb, this);
@@ -132,8 +133,8 @@ void PeriodicImageProjection::connectCb()
   std::lock_guard<std::mutex> lock(connect_mutex_);
   if (image_pub_.getNumSubscribers() == 0) {
     RCLCPP_INFO_EXPRESSION(node_->get_logger(), enabled_, "No subscribers. Stopping image projection.");
-    RCLCPP_INFO_THROTTLE(node_->get_logger(), (*node_->get_clock()), 10000,
-                         "No subscribers. Image projection is paused. This message is throttled to 10s.");
+    RCLCPP_DEBUG_THROTTLE(node_->get_logger(), (*node_->get_clock()), 10000,
+                          "No subscribers. Image projection is paused. This message is throttled to 10s.");
     enabled_ = false;
     image_projection_lib_.getCameraLoader().stopImageSubscribers();
   } else {
