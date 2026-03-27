@@ -1,6 +1,7 @@
 #include <ros/ros.h>
 
-int main(int argc, char** argv) {
+int main(int argc, char** argv)
+{
   /*ros::init(argc, argv, "image_projection_server_node");
   nodelet::Loader nodelet;
   nodelet::M_string remap(ros::names::getRemappings());

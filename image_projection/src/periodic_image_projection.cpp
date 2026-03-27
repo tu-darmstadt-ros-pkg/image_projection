@@ -22,6 +22,10 @@ PeriodicImageProjection::PeriodicImageProjection(const rclcpp::Node::SharedPtr n
 
 bool PeriodicImageProjection::init()
 {
+  virtual_sensor_transform_ = Eigen::Isometry3d::Identity();
+  virtual_sensor_base_pose_ = Eigen::Isometry3d::Identity();
+  virtual_sensor_pose_ = Eigen::Isometry3d::Identity();
+  virtual_sensor_optical_pose_ = Eigen::Isometry3d::Identity();
   // Load parameters
   std::string projection_type;
   loadMandatoryParameter(node_, "projection_type", projection_type);
@@ -82,7 +86,7 @@ bool PeriodicImageProjection::init()
       "set_transform", 10, std::bind(&PeriodicImageProjection::poseTransformCallback, this, std::placeholders::_1));
 
   // Publish virtual sensor frame tf
-  node_->declare_parameter("publish_tf", true);
+  node_->declare_parameter("publish_tf", false);
   node_->get_parameter("publish_tf", publish_tf_);
 
   virtual_frame_sub_ = hector::createReconfigurableParameter(
@@ -98,17 +102,15 @@ bool PeriodicImageProjection::init()
           std::bind(&PeriodicImageProjection::virtualSensorOpticalFrameParamCallback, this, std::placeholders::_1)));
   projection_->updateVirtualSensorOpticalFrame(virtual_sensor_optical_frame_);
 
+  optical_transform_msg_ = tf2::eigenToTransform(optical_frame_transform_);
   if (!virtual_sensor_optical_frame_.empty()) {
-    optical_transform_msg_ = tf2::eigenToTransform(optical_frame_transform_);
+
     optical_transform_msg_.header.frame_id = virtual_sensor_frame_;
     optical_transform_msg_.child_frame_id = virtual_sensor_optical_frame_;
   }
   if (publish_tf_) {
     tf_timer_ = node_->create_wall_timer(50ms, std::bind(&PeriodicImageProjection::publishTfTimerCallback, this));
   }
-
-  virtual_sensor_transform_ = Eigen::Isometry3d::Identity();
-  virtual_sensor_base_pose_ = Eigen::Isometry3d::Identity();
 
   // Image publisher
   image_transport::SubscriberStatusCallback connect_cb = std::bind(&PeriodicImageProjection::connectCb, this);
@@ -158,8 +160,8 @@ void PeriodicImageProjection::poseParamCallback(std::vector<double> pose_vec)
 void PeriodicImageProjection::poseCallback(const std::shared_ptr<geometry_msgs::msg::Pose const> pose)
 {
   std::scoped_lock<std::recursive_mutex> mutex_lock(reconfigure_mutex_);
-  tf2::fromMsg(*pose, virtual_sensor_pose_);
-  updateSensorPose(virtual_sensor_pose_);
+  tf2::fromMsg(*pose, virtual_sensor_base_pose_);
+  updateSensorPose(virtual_sensor_base_pose_);
   initProjectionMat();
   publishCameraFrameToTf();
 }

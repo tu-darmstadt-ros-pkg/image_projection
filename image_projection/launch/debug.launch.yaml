@@ -1,14 +1,14 @@
 launch:
-  - arg:
-      name: "log_level"
-      default: "info"
-  - node:
-      pkg: image_projection
-      exec: periodic_image_projection_standalone_node
-      name: image_projection_standalone
-      args: "--ros-args --log-level image_projection_standalone:=$(var log_level)"
-      param:
-        - name: "projection_type"
-          value: "image_projection_plugins::EquirectangularProjection"
-        - name: "base_frame"
-          value: "base_link"
+- arg:
+    name: log_level
+    default: info
+- node:
+    pkg: image_projection
+    exec: periodic_image_projection_standalone_node
+    name: image_projection_standalone
+    args: --ros-args --log-level image_projection_standalone:=$(var log_level)
+    param:
+    - name: projection_type
+      value: image_projection_plugins::EquirectangularProjection
+    - name: base_frame
+      value: base_link

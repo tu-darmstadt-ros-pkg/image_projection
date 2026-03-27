@@ -5,15 +5,15 @@
 
 namespace image_projection {
 
-class ImageProjectionServer : public rclcpp::Node {
+class ImageProjectionServer : public rclcpp::Node
+{
 public:
   ImageProjectionServer(const rclcpp::NodeOptions& options);
+
 private:
-
-  //rclcpp::Service<>::SharedPtr projection_srv_;
-
+  // rclcpp::Service<>::SharedPtr projection_srv_;
 };
 
-}
+}  // namespace image_projection
 
 #endif

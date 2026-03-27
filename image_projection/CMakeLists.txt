@@ -79,13 +79,16 @@ target_include_directories(
 # ${PROJECT_NAME}_gencfg)
 ament_target_dependencies(${PROJECT_NAME} PUBLIC ${DEPENDENCIES})
 
-add_library(periodic_image_projection src/periodic_image_projection.cpp)
-ament_target_dependencies(periodic_image_projection rclcpp rclcpp_components)
-target_link_libraries(periodic_image_projection ${PROJECT_NAME})
+add_library(composable_periodic_image_projection SHARED
+            src/periodic_image_projection_node.cpp)
+ament_target_dependencies(composable_periodic_image_projection rclcpp
+                          rclcpp_components)
+target_link_libraries(composable_periodic_image_projection ${PROJECT_NAME})
 
 rclcpp_components_register_node(
-  periodic_image_projection PLUGIN "image_projection::PeriodicImageProjection"
-  EXECUTABLE periodic_image_projection_node)
+  composable_periodic_image_projection PLUGIN
+  "image_projection::PeriodicImageProjectionNode" EXECUTABLE
+  periodic_image_projection_node)
 
 add_library(image_projection_server src/image_projection_server.cpp)
 ament_target_dependencies(image_projection_server rclcpp rclcpp_components)
@@ -106,8 +109,8 @@ target_link_libraries(image_projection_server_standalone_node ${PROJECT_NAME})
 # Install
 ament_export_targets(export_image_projection)
 install(
-  TARGETS ${PROJECT_NAME} periodic_image_projection image_projection_server
-          periodic_image_projection_standalone_node
+  TARGETS ${PROJECT_NAME} composable_periodic_image_projection
+          image_projection_server periodic_image_projection_standalone_node
           image_projection_server_standalone_node
   EXPORT export_${PROJECT_NAME}
   LIBRARY DESTINATION lib

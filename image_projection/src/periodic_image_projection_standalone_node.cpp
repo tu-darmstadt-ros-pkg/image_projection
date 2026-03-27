@@ -1,7 +1,7 @@
 #include <image_projection/periodic_image_projection_node.h>
 #include <rclcpp/rclcpp.hpp>
 
-int main(int argc, char ** argv)
+int main(int argc, char** argv)
 {
   rclcpp::init(argc, argv);
   auto projection = std::make_shared<image_projection::PeriodicImageProjectionNode>(rclcpp::NodeOptions{});
