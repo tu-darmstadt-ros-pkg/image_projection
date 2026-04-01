@@ -202,8 +202,8 @@ void PeriodicImageProjection::projectAndPublishLatestImages()
   auto images = image_projection_lib_.getLatestImages(stamp, encoding_);
   if (stamp == last_image_stamp_) {
     // No new images received
-    RCLCPP_INFO_THROTTLE(node_->get_logger(), *(node_->get_clock()), 3000,
-                         "No new images received. Skipping projection. This message is throttled.");
+    RCLCPP_DEBUG_THROTTLE(node_->get_logger(), *(node_->get_clock()), 3000,
+                          "No new images received. Skipping projection. This message is throttled.");
     return;
   }
   last_image_stamp_ = stamp;
