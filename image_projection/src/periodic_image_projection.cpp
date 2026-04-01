@@ -202,7 +202,7 @@ void PeriodicImageProjection::projectAndPublishLatestImages()
   auto images = image_projection_lib_.getLatestImages(stamp, encoding_);
   if (stamp == last_image_stamp_) {
     // No new images received
-    RCLCPP_DEBUG_THROTTLE(node_->get_logger(), *(node_->get_clock()), 3000,
+    RCLCPP_DEBUG_THROTTLE(node_->get_logger(), *(node_->get_clock()), 60000,
                           "No new images received. Skipping projection. This message is throttled.");
     return;
   }
@@ -238,7 +238,9 @@ void PeriodicImageProjection::projectAndPublishLatestImages()
   header.stamp = stamp;
   header.frame_id = virtual_sensor_optical_frame_;
   cv_bridge::CvImage cv_image(header, encoding_, projected_image_.getMat(cv::ACCESS_READ));
-  image_pub_.publish(cv_image.toImageMsg());
+  sensor_msgs::msg::Image::UniquePtr image_msg;
+  cv_image.toImageMsg(*image_msg);
+  image_pub_.publish(std::move(image_msg));
 }
 
 bool PeriodicImageProjection::projectPixelToRayCb(
