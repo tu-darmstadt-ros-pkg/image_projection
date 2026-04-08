@@ -69,8 +69,9 @@ void PinholeProjection::publishCameraInfo() const
   if (virtualSensorOpticalFrame().empty()) {
     return;
   }
-  const sensor_msgs::msg::CameraInfo info = parametersToCameraInfo();
-  camera_info_pub_->publish(info);
+  sensor_msgs::msg::CameraInfo::UniquePtr info =
+      std::make_unique<sensor_msgs::msg::CameraInfo>(parametersToCameraInfo());
+  camera_info_pub_->publish(std::move(info));
 }
 
 sensor_msgs::msg::CameraInfo PinholeProjection::parametersToCameraInfo() const
