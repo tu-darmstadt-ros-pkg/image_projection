@@ -35,6 +35,10 @@ bool PeriodicImageProjection::init()
   node_->declare_parameter("encoding", "");
   node_->get_parameter("encoding", encoding_);
 
+  // per default only advertise compressed topic and raw
+  node_->declare_parameter<std::vector<std::string>>("projection.enable_pub_plugins",
+                                                     {"image_transport/compressed", "image_transport/raw"});
+
   /*
   node_->declare_parameter("pose", std::vector<double>(6, 0));
   std::vector<double> pose_vec = node_->get_parameter("pose").as_double_array();
