@@ -1,14 +1,40 @@
-#include <nodelet/loader.h>
-#include <ros/ros.h>
+#include <image_projection/periodic_image_projection_node.h>
 
-int main(int argc, char** argv) {
-  ros::init(argc, argv, "periodic_image_projection_node");
-  nodelet::Loader nodelet;
-  const nodelet::M_string& remap(ros::names::getRemappings());
-  nodelet::V_string nargv;
-  const std::string& nodelet_name = ros::this_node::getName();
-  ROS_INFO_STREAM("Started " << nodelet_name << " nodelet.");
-  nodelet.load(nodelet_name, "image_projection/PeriodicImageProjectionNodelet", remap, nargv);
-  ros::spin();
-  return 0;
+namespace image_projection {
+
+PeriodicImageProjectionNode::PeriodicImageProjectionNode(const rclcpp::NodeOptions& options)
+    : node_(std::make_shared<rclcpp::Node>("periodic_image_projection_node", options))
+{
+  // Create PeriodicImageProjection with shared node handle
+  periodic_image_projection_ = std::make_shared<PeriodicImageProjection>(node_);
+
+  if (!periodic_image_projection_->init()) {
+    RCLCPP_ERROR(node_->get_logger(), "Initialization of PeriodicImageProjection failed. Exiting.");
+    rclcpp::shutdown();
+    return;
+  }
+
+  // Declare or get update rate
+  double update_rate = node_->declare_parameter("update_rate", 1.0);
+  using namespace std::chrono_literals;
+  auto period = std::chrono::duration<double>(1.0 / update_rate);
+
+  timer_ = node_->create_wall_timer(std::chrono::duration_cast<std::chrono::milliseconds>(period),
+                                    std::bind(&PeriodicImageProjectionNode::timerCb, this));
+  RCLCPP_INFO(node_->get_logger(), "PeriodicImageProjectionNode initialized with update rate: %.2f Hz", update_rate);
 }
+
+rclcpp::node_interfaces::NodeBaseInterface::SharedPtr PeriodicImageProjectionNode::get_node_base_interface() const
+{
+  return this->node_->get_node_base_interface();
+}
+
+void PeriodicImageProjectionNode::timerCb()
+{
+  periodic_image_projection_->projectAndPublishLatestImages();
+}
+
+}  // namespace image_projection
+
+// Register as composable
+RCLCPP_COMPONENTS_REGISTER_NODE(image_projection::PeriodicImageProjectionNode)

@@ -2,12 +2,9 @@
 
 namespace image_projection {
 
-ImageProjectionServer::ImageProjectionServer(const ros::NodeHandle& nh, const ros::NodeHandle& pnh)
-  : nh_(nh), pnh_(pnh)
-{
-
-}
-
-
-
-}
+ImageProjectionServer::ImageProjectionServer(const rclcpp::NodeOptions& options)
+    : rclcpp::Node("image_projection_server", options)
+{}
+}  // namespace image_projection
+#include <rclcpp_components/register_node_macro.hpp>
+RCLCPP_COMPONENTS_REGISTER_NODE(image_projection::ImageProjectionServer)

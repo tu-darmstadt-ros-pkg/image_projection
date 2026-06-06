@@ -9,7 +9,7 @@ namespace image_projection_plugins {
 class PinholeProjection : public image_projection_plugin_interface::ProjectionBase
 {
 public:
-  bool initialize(const rclcpp::Node::SharedPtr& node, const std::string& name) override;
+  bool initialize(const rclcpp::Node::SharedPtr& node) override;
   Eigen::Vector2d projectionSurfacePointToTargetImagePixel(const Eigen::Vector3d& point) const override;
   Eigen::Vector3d targetImagePixelToProjectionSurfacePoint(const Eigen::Vector2d& target_image_pixel) const override;
 
@@ -18,6 +18,7 @@ protected:
 
 private:
   void onParametersChanged() override;
+  void updateCameraInfoPublisher();
   void publishCameraInfo() const;
   sensor_msgs::msg::CameraInfo parametersToCameraInfo() const;
 
@@ -30,8 +31,6 @@ private:
   double m_per_pixel_{0};
   double image_width_2_{0};
   double image_height_2_{0};
-
-  std::string virtual_sensor_optical_frame_;
 };
 
 }  // namespace image_projection_plugins

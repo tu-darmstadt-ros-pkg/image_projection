@@ -1,0 +1,74 @@
+name: Lint, Build & Test
+on:
+  push:
+    branches:
+    - main
+  pull_request:
+    branches:
+    - main
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  Linting:
+    name: Lint Code Base
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Setup
+      run: |
+        sudo apt-get update && sudo apt-get install -y black clang-format cppcheck libxml2-utils
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+
+    - name: Install and Run pre-commit
+      uses: pre-commit/action@v3.0.1
+      with:
+        extra_args: --all-files
+
+
+
+
+  build-and-test:
+    needs: Linting
+    strategy:
+      matrix:
+        setup:
+        - rosdistro: jazzy
+          os: ubuntu-24.04
+        - rosdistro: rolling
+          os: ubuntu-latest
+    runs-on: ${{ matrix.setup.os }}
+    container:
+      image: ros:${{ matrix.setup.rosdistro }}-ros-base
+    steps:
+    - name: install build tools
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y ros-dev-tools
+    - uses: actions/checkout@v4
+      with:
+        repository: tu-darmstadt-ros-pkg/hector_ros2_utils
+        path: src/hector_ros2_utils
+    - uses: actions/checkout@v4
+      with:
+        path: src/repo
+    - name: rosdep
+      run: |
+        rosdep update --rosdistro ${{ matrix.setup.rosdistro }} --include-eol-distros
+        rosdep install -y --from-paths src --ignore-src --rosdistro ${{ matrix.setup.rosdistro }}
+    - name: build
+      run: |
+        source /opt/ros/${{ matrix.setup.rosdistro }}/setup.bash
+        colcon build
+    - name: test
+      run: |
+        source /opt/ros/${{ matrix.setup.rosdistro }}/setup.bash
+        colcon test
+        colcon test-result --verbose

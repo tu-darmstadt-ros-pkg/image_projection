@@ -1,22 +1,20 @@
-<?xml version="1.0"?>
+<?xml version='1.0' encoding='UTF-8'?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>image_projection_plugin_interface</name>
   <version>0.0.0</version>
   <description>Base class for projection plugins</description>
-
   <maintainer email="oehler@sim.tu-darmstadt.de">Martin Oehler</maintainer>
-  <author email="oehler@sim.tu-darmstadt.de">Martin Oehler</author>
-
   <license>MIT</license>
 
+  <author email="oehler@sim.tu-darmstadt.de">Martin Oehler</author>
   <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <depend>rclcpp</depend>
   <depend>eigen</depend>
   <depend>hector_ros2_utils</depend>
+  <depend>rclcpp</depend>
 
   <export>
-      <build_type>ament_cmake</build_type>
+    <build_type>ament_cmake</build_type>
   </export>
 </package>

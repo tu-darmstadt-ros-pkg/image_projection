@@ -10,7 +10,7 @@ class ProjectionBase
 {
 public:
   virtual ~ProjectionBase();
-  virtual bool initialize(const rclcpp::Node::SharedPtr& node, const std::string& name);
+  virtual bool initialize(const rclcpp::Node::SharedPtr& node);
 
   bool loadParameters();
 
@@ -32,15 +32,32 @@ public:
   void setImageHeight(int image_height);
   [[nodiscard]] int imageHeight() const;
 
+  void updateVirtualSensorFrame(const std::string& frame_id)
+  {
+    virtual_sensor_frame_ = frame_id;
+    this->onParametersChanged();
+  }
+  void updateVirtualSensorOpticalFrame(const std::string& optical_frame_id)
+  {
+    virtual_sensor_optical_frame_ = optical_frame_id;
+    this->onParametersChanged();
+  }
+  [[nodiscard]] const std::string& virtualSensorOpticalFrame() const;
+  [[nodiscard]] const std::string& virtualSensorFrame() const;
+
 protected:
   virtual bool loadProjectionParameters() = 0;
 
   template <typename ParameterT>
   void addReconfigurableParameter(const std::string& name, ParameterT& param, const std::string& description,
-                                  const hector::ReconfigurableParameterOptions<ParameterT>& options = {})
+                                  hector::ParameterOptions<ParameterT> options = {})
   {
+    options.onUpdate([this](const ParameterT& value) {
+      mappingChanged();
+      this->onParametersChanged();
+    });
     param_subscriptions_.push_back(
-        hector::createReconfigurableParameter(node_, name_ + "." + name, param, description, options));
+        hector::createReconfigurableParameter(node_, name, std::ref(param), description, options));
   }
 
   /**
@@ -57,11 +74,14 @@ private:
   bool mapping_changed_{true};
 
   // Parameters
-  std::string name_;  // Name of this plugin. Used as parameter namespace
+  // std::string name_;  // Name of this plugin. Used as parameter namespace
   int image_width_{0};
   int image_height_{0};
 
-  std::vector<hector::ReconfigurableParameterSubscription> param_subscriptions_;
+  std::string virtual_sensor_frame_;
+  std::string virtual_sensor_optical_frame_;
+
+  std::vector<hector::ParameterSubscription> param_subscriptions_;
   rclcpp::node_interfaces::PostSetParametersCallbackHandle::SharedPtr parameter_cb_handle_;
 };
 }  // namespace image_projection_plugin_interface

@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <library path="image_projection_plugins">
   <class type="image_projection_plugins::PinholeProjection" base_class_type="image_projection_plugin_interface::ProjectionBase">
     <description>Pinhole projection plugin</description>

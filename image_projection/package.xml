@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version='1.0' encoding='UTF-8'?>
 <package format="2">
   <name>image_projection</name>
   <version>0.0.0</version>
@@ -8,20 +8,22 @@
   <!-- <url type="website">http://wiki.ros.org/image_projection</url> -->
   <author email="oehler@sim.tu-darmstadt.de">Martin Oehler</author>
 
+  <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <buildtool_depend>catkin</buildtool_depend>
-  <depend>roscpp</depend>
-  <depend>nodelet</depend>
-  <depend>sensor_msgs</depend>
-  <depend>tf2_ros</depend>
-  <depend>kalibr_camera_loader</depend>
-  <depend>eigen_conversions</depend>
+  <depend>extended_camera_loader</depend>
+  <depend>hector_ros2_utils</depend>
   <depend>image_projection_msgs</depend>
   <depend>image_projection_plugin_interface</depend>
-  <depend>dynamic_reconfigure</depend>
   <depend>image_transport</depend>
+  <depend>pluginlib</depend>
+  <depend>rclcpp</depend>
+  <depend>rclcpp_components</depend>
+  <depend>sensor_msgs</depend>
+  <depend>tf2_eigen</depend>
+  <depend>tf2_ros</depend>
 
   <export>
-    <nodelet plugin="${prefix}/nodelet_plugins.xml" />
+    <build_type>ament_cmake</build_type>
+    <!--nodelet plugin="${prefix}/nodelet_plugins.xml" /-->
   </export>
 </package>
