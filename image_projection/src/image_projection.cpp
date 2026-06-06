@@ -18,7 +18,7 @@ ImageProjection::ImageProjection(const rclcpp::Node::SharedPtr& node)
 {
 
   tf_buffer_ = std::make_shared<tf2_ros::Buffer>(node_->get_clock());
-  tf_listener_ = std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
+  tf_listener_ = std::make_shared<tf2_ros::TransformListener>(*tf_buffer_, node_);
 
   // Load parameters
   node_->declare_parameter("save_folder", std::string(""));
