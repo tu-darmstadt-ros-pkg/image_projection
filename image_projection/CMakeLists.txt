@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.16)
 project(image_projection)
 
 # Default to C++17
@@ -77,13 +77,25 @@ target_include_directories(
 # target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBRARIES})
 # add_dependencies(${PROJECT_NAME} ${catkin_EXPORTED_TARGETS}
 # ${PROJECT_NAME}_gencfg)
-ament_target_dependencies(${PROJECT_NAME} PUBLIC ${DEPENDENCIES})
+target_link_libraries(
+  ${PROJECT_NAME}
+  PUBLIC rclcpp::rclcpp
+         rclcpp_components::component
+         hector_ros2_utils::hector_ros2_utils
+         extended_camera_loader::extended_camera_loader
+         ${sensor_msgs_TARGETS}
+         tf2_ros::tf2_ros
+         tf2_eigen::tf2_eigen
+         image_transport::image_transport
+         ${image_projection_msgs_TARGETS}
+         image_projection_plugin_interface::image_projection_plugin_interface
+         ${OpenCV_LIBS}
+         pluginlib::pluginlib)
 
 add_library(composable_periodic_image_projection SHARED
             src/periodic_image_projection_node.cpp)
-ament_target_dependencies(composable_periodic_image_projection rclcpp
-                          rclcpp_components)
-target_link_libraries(composable_periodic_image_projection ${PROJECT_NAME})
+target_link_libraries(composable_periodic_image_projection ${PROJECT_NAME}
+                      rclcpp::rclcpp rclcpp_components::component)
 
 rclcpp_components_register_node(
   composable_periodic_image_projection PLUGIN
@@ -91,8 +103,8 @@ rclcpp_components_register_node(
   periodic_image_projection_node)
 
 add_library(image_projection_server src/image_projection_server.cpp)
-ament_target_dependencies(image_projection_server rclcpp rclcpp_components)
-target_link_libraries(image_projection_server ${PROJECT_NAME})
+target_link_libraries(image_projection_server ${PROJECT_NAME} rclcpp::rclcpp
+                      rclcpp_components::component)
 
 rclcpp_components_register_node(
   image_projection_server PLUGIN "image_projection::ImageProjectionServer"

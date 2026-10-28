@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.16)
 project(image_projection_plugin_interface)
 
 # Default to C++17
@@ -27,8 +27,8 @@ target_include_directories(
   ${PROJECT_NAME}
   PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
          "$<INSTALL_INTERFACE:include>")
-target_link_libraries(${PROJECT_NAME} PUBLIC Eigen3::Eigen)
-ament_target_dependencies(${PROJECT_NAME} PUBLIC ${DEPENDENCIES})
+target_link_libraries(${PROJECT_NAME} PUBLIC Eigen3::Eigen rclcpp::rclcpp
+                                             hector_ros2_utils::hector_ros2_utils)
 
 # Install
 install(

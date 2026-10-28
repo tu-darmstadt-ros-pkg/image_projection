@@ -14,7 +14,7 @@ PeriodicImageProjection::PeriodicImageProjection(const rclcpp::Node::SharedPtr n
       publish_tf_(false),
       last_tf_stamp_(node->get_clock()->now()),
       image_projection_lib_(node),
-      it_(node),
+      it_(*node),
       always_recompute_mapping_(false)
 {
   tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(*node_);

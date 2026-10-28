@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.16)
 project(image_projection_plugins)
 
 # Default to C++17
@@ -33,7 +33,13 @@ add_library(
 target_include_directories(
   ${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
                          $<INSTALL_INTERFACE:include>)
-ament_target_dependencies(${PROJECT_NAME} PUBLIC ${DEPENDENCIES})
+target_link_libraries(
+  ${PROJECT_NAME}
+  PUBLIC rclcpp::rclcpp
+         hector_ros2_utils::hector_ros2_utils
+         image_projection_plugin_interface::image_projection_plugin_interface
+         pluginlib::pluginlib
+         ${sensor_msgs_TARGETS})
 
 # Install
 install(
