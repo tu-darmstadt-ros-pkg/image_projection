@@ -21,6 +21,7 @@ public:
    */
   [[nodiscard]] bool mappingChanged() const;
   void unsetMappingChanged();
+  void setMappingChanged();
 
   [[nodiscard]] virtual Eigen::Vector2d projectionSurfacePointToTargetImagePixel(const Eigen::Vector3d& point) const = 0;
   [[nodiscard]] virtual Eigen::Vector3d
@@ -52,9 +53,9 @@ protected:
   void addReconfigurableParameter(const std::string& name, ParameterT& param, const std::string& description,
                                   hector::ParameterOptions<ParameterT> options = {})
   {
-    options.onUpdate([this](const ParameterT& value) {
-      mappingChanged();
+    options.onUpdate([this](const ParameterT&) {
       this->onParametersChanged();
+      setMappingChanged();
     });
     param_subscriptions_.push_back(
         hector::createReconfigurableParameter(node_, name, std::ref(param), description, options));
@@ -68,7 +69,6 @@ protected:
   rclcpp::Node::SharedPtr node_;
 
 private:
-  void parameterUpdateCallback(const std::vector<rclcpp::Parameter>& parameters);
   bool loadBaseParameters();
 
   bool mapping_changed_{true};

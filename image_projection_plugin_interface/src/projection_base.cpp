@@ -8,13 +8,9 @@ ProjectionBase::~ProjectionBase() = default;
 
 bool ProjectionBase::initialize(const rclcpp::Node::SharedPtr& node)
 {
-
   node_ = node;
   // name_ = name;
 
-  // DEPRECATED
-  /*parameter_cb_handle_ = node_->add_post_set_parameters_callback(
-      std::bind(&ProjectionBase::parameterUpdateCallback, this, std::placeholders::_1));*/
   return true;
 }
 
@@ -31,6 +27,11 @@ bool ProjectionBase::loadParameters()
 bool ProjectionBase::mappingChanged() const
 {
   return mapping_changed_;
+}
+
+void ProjectionBase::setMappingChanged()
+{
+  mapping_changed_ = true;
 }
 
 void ProjectionBase::unsetMappingChanged()
@@ -70,24 +71,6 @@ void ProjectionBase::setImageWidth(const int image_width)
 void ProjectionBase::setImageHeight(int image_height)
 {
   image_height_ = image_height;
-}
-
-// DEPRECATED
-void ProjectionBase::parameterUpdateCallback(const std::vector<rclcpp::Parameter>& parameters)
-{
-  /*bool parameters_changed = false;
-  for (const auto& parameter : parameters) {
-    // Check if parameter starts with the name of this plugin
-    if (parameter.get_name().rfind(name_, 0) == 0) {
-      parameters_changed = true;
-      break;
-    }
-  }
-  // Notify plugins and external users
-  if (parameters_changed) {
-    mapping_changed_ = true;
-    onParametersChanged();
-  }*/
 }
 
 bool ProjectionBase::loadBaseParameters()

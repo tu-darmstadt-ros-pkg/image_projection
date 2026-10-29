@@ -13,7 +13,7 @@ endif()
 
 # Find dependencies
 find_package(ament_cmake REQUIRED)
-set(DEPENDENCIES rclcpp hector_ros2_utils image_projection_plugin_interface
+set(DEPENDENCIES rclcpp  image_projection_plugin_interface
                  pluginlib sensor_msgs)
 
 foreach(dependency IN ITEMS ${DEPENDENCIES})
@@ -36,7 +36,6 @@ target_include_directories(
 target_link_libraries(
   ${PROJECT_NAME}
   PUBLIC rclcpp::rclcpp
-         hector_ros2_utils::hector_ros2_utils
          image_projection_plugin_interface::image_projection_plugin_interface
          pluginlib::pluginlib
          ${sensor_msgs_TARGETS})

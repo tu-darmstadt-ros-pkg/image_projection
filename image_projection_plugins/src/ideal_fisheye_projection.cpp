@@ -2,7 +2,7 @@
 
 namespace image_projection_plugins {
 
-Eigen::Vector2d IdealFisheyeProjection::projectionSurfacePointToTargetImagePixel(const Eigen::Vector3d& point) const
+Eigen::Vector2d IdealFisheyeProjection::projectionSurfacePointToTargetImagePixel(const Eigen::Vector3d&) const
 {
   // TODO implement
   RCLCPP_ERROR(node_->get_logger(), "IdealFisheyeProjection::projectionSurfacePointToTargetImagePixel not implemented");
@@ -61,7 +61,6 @@ void IdealFisheyeProjection::onParametersChanged()
   } else {
     angle_step_ = fov_rad_ / imageHeight();
   }
-  mappingChanged();
 }
 
 }  // namespace image_projection_plugins

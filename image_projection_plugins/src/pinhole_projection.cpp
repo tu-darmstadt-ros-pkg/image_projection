@@ -9,7 +9,7 @@ bool PinholeProjection::initialize(const rclcpp::Node::SharedPtr& node)
   return true;
 }
 
-Eigen::Vector2d PinholeProjection::projectionSurfacePointToTargetImagePixel(const Eigen::Vector3d& point) const
+Eigen::Vector2d PinholeProjection::projectionSurfacePointToTargetImagePixel(const Eigen::Vector3d&) const
 {
   // TODO implement
   RCLCPP_ERROR(node_->get_logger(), "Not implemented");

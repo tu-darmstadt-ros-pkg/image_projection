@@ -16,7 +16,6 @@ find_package(ament_cmake REQUIRED)
 set(DEPENDENCIES
     rclcpp
     rclcpp_components
-    hector_ros2_utils
     extended_camera_loader
     sensor_msgs
     tf2_ros
@@ -81,7 +80,6 @@ target_link_libraries(
   ${PROJECT_NAME}
   PUBLIC rclcpp::rclcpp
          rclcpp_components::component
-         hector_ros2_utils::hector_ros2_utils
          extended_camera_loader::extended_camera_loader
          ${sensor_msgs_TARGETS}
          tf2_ros::tf2_ros

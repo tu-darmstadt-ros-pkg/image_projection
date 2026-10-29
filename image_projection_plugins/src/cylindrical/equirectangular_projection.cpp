@@ -2,7 +2,7 @@
 
 namespace image_projection_plugins {
 
-Eigen::Vector2d EquirectangularProjection::projectionSurfacePointToTargetImagePixel(const Eigen::Vector3d& point) const
+Eigen::Vector2d EquirectangularProjection::projectionSurfacePointToTargetImagePixel(const Eigen::Vector3d&) const
 {
   // TODO implement
   RCLCPP_ERROR(node_->get_logger(), "Not implemented");
