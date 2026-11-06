@@ -298,7 +298,7 @@ void PeriodicImageProjection::updateSensorPose(const Eigen::Isometry3d& sensor_p
 {
   virtual_sensor_base_pose_ = sensor_pose;
   virtual_sensor_pose_ = virtual_sensor_base_pose_ * virtual_sensor_transform_;
-  virtual_sensor_optical_pose_ = sensor_pose * optical_frame_transform_;
+  virtual_sensor_optical_pose_ = virtual_sensor_pose_ * optical_frame_transform_;
 }
 
 void PeriodicImageProjection::updateSensorTransform(const Eigen::Isometry3d& sensor_transform)
